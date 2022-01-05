@@ -12,7 +12,7 @@ import { isMac } from "../../common/vars";
 import { ClusterStore } from "../../common/cluster-store/cluster-store";
 import { navigate } from "../navigation";
 import { entitySettingsURL } from "../../common/routes";
-import { defaultHotbarCells } from "../../common/hotbar-types";
+import { defaultHotbarCells } from "../../common/hotbar-store/hotbar-types";
 
 function sendToBackchannel(backchannel: string, notificationId: string, data: BackchannelArg): void {
   notificationsStore.remove(notificationId);

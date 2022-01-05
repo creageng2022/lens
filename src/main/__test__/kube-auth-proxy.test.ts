@@ -107,7 +107,7 @@ describe("kube auth proxy tests", () => {
     mockFs.restore();
   });
 
-  it("calling exit multiple times shouldn't throw", async () => {
+  it("calling exit multiple times shouldn't throw", () => {
     const cluster = createCluster({
       id: "foobar",
       kubeConfigPath: "minikube-config.yml",
@@ -126,7 +126,7 @@ describe("kube auth proxy tests", () => {
     let listeners: EventEmitter;
     let proxy: KubeAuthProxy;
 
-    beforeEach(async () => {
+    beforeEach(() => {
       mockedCP = mock<ChildProcess>();
       listeners = new EventEmitter();
 

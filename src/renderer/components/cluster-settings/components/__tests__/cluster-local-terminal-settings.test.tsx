@@ -87,7 +87,7 @@ describe("ClusterLocalTerminalSettings", () => {
   });
 
   it("should save the new CWD if path is a directory", async () => {
-    mockStat.mockImplementation(async (path: string) => {
+    mockStat.mockImplementation((path: string) => {
       expect(path).toBe("/foobar");
 
       return {
@@ -112,7 +112,7 @@ describe("ClusterLocalTerminalSettings", () => {
   });
 
   it("should not save the new CWD if path is a file", async () => {
-    mockStat.mockImplementation(async (path: string) => {
+    mockStat.mockImplementation((path: string) => {
       expect(path).toBe("/foobar");
 
       return {

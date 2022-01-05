@@ -25,6 +25,6 @@ export function registerCustomThemes(): void {
   });
 }
 
-export async function loadCustomTheme(name: string): Promise<MonacoThemeData> {
+export function loadCustomTheme(name: string): Promise<MonacoThemeData> {
   return import(`./monaco-themes/${name}.json`);
 }

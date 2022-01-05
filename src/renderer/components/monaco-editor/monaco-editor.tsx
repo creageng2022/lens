@@ -13,7 +13,7 @@ import { MonacoValidator, monacoValidators } from "./monaco-validators";
 import { debounce, merge } from "lodash";
 import { cssNames, disposer } from "../../utils";
 import { UserStore } from "../../../common/user-store";
-import { ThemeStore } from "../../theme.store";
+import { ThemeStore } from "../../theme-store/theme.store";
 
 export type MonacoEditorId = string;
 

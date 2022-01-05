@@ -3,7 +3,6 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 
-import { catalogCategoryRegistry } from "../catalog/catalog-category-registry";
 import { CatalogEntity, CatalogEntityActionContext, CatalogEntityContextMenuContext, CatalogEntityMetadata, CatalogEntityStatus, CatalogCategory, CatalogCategorySpec } from "../catalog";
 import { clusterActivateHandler, clusterDisconnectHandler } from "../cluster-ipc";
 import { ClusterStore } from "../cluster-store/cluster-store";
@@ -81,19 +80,11 @@ export class KubernetesCluster extends CatalogEntity<KubernetesClusterMetadata, 
     }
   }
 
-  async onRun(context: CatalogEntityActionContext) {
+  onRun(context: CatalogEntityActionContext) {
     context.navigate(`/cluster/${this.metadata.uid}`);
   }
 
-  onDetailsOpen(): void {
-    //
-  }
-
-  onSettingsOpen(): void {
-    //
-  }
-
-  async onContextMenuOpen(context: CatalogEntityContextMenuContext) {
+  onContextMenuOpen(context: CatalogEntityContextMenuContext) {
     if (!this.metadata.source || this.metadata.source === "local") {
       context.menuItems.push({
         title: "Settings",
@@ -122,14 +113,10 @@ export class KubernetesCluster extends CatalogEntity<KubernetesClusterMetadata, 
         });
         break;
     }
-
-    catalogCategoryRegistry
-      .getCategoryForEntity<KubernetesClusterCategory>(this)
-      ?.emit("contextMenuOpen", this, context);
   }
 }
 
-class KubernetesClusterCategory extends CatalogCategory {
+export class KubernetesClusterCategory extends CatalogCategory {
   public readonly apiVersion = "catalog.k8slens.dev/v1alpha1";
   public readonly kind = "CatalogCategory";
   public metadata = {
@@ -149,7 +136,3 @@ class KubernetesClusterCategory extends CatalogCategory {
     },
   };
 }
-
-export const kubernetesClusterCategory = new KubernetesClusterCategory();
-
-catalogCategoryRegistry.add(kubernetesClusterCategory);

@@ -4,9 +4,8 @@
  */
 
 import { computed, observable, reaction } from "mobx";
-import { WeblinkStore } from "../../common/weblink-store";
+import type { WeblinkStore } from "../../common/weblink-store";
 import { WebLink } from "../../common/catalog-entities";
-import { catalogEntityRegistry } from "../catalog";
 import got from "got";
 import type { Disposer } from "../../common/utils";
 import { random } from "lodash";
@@ -28,9 +27,7 @@ async function validateLink(link: WebLink) {
   }
 }
 
-
-export function syncWeblinks() {
-  const weblinkStore = WeblinkStore.getInstance();
+export function getWeblinksSource(weblinkStore: WeblinkStore) {
   const webLinkEntities = observable.map<string, [WebLink, Disposer]>();
 
   function periodicallyCheckLink(link: WebLink): Disposer {
@@ -86,5 +83,5 @@ export function syncWeblinks() {
     }
   }, { fireImmediately: true });
 
-  catalogEntityRegistry.addComputedSource("weblinks", computed(() => Array.from(webLinkEntities.values(), ([link]) => link)));
+  return computed(() => Array.from(webLinkEntities.values(), ([link]) => link));
 }

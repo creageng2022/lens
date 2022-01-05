@@ -18,8 +18,8 @@ import { getDiForUnitTesting } from "../../../getDiForUnitTesting";
 import extensionLoaderInjectable from "../../../../extensions/extension-loader/extension-loader.injectable";
 import { DiRender, renderFor } from "../../test-utils/renderFor";
 import extensionDiscoveryInjectable from "../../../../extensions/extension-discovery/extension-discovery.injectable";
-import directoryForUserDataInjectable from "../../../../common/app-paths/directory-for-user-data/directory-for-user-data.injectable";
-import directoryForDownloadsInjectable from "../../../../common/app-paths/directory-for-downloads/directory-for-downloads.injectable";
+import directoryForUserDataInjectable from "../../../../common/app-paths/directory-for-user-data.injectable";
+import directoryForDownloadsInjectable from "../../../../common/app-paths/directory-for-downloads.injectable";
 
 mockWindow();
 
@@ -114,7 +114,7 @@ describe("Extensions", () => {
     });
   });
 
-  it("disables install button while installing", async () => {
+  it("disables install button while installing", () => {
     const res = render(<Extensions />);
 
     (fse.unlink as jest.MockedFunction<typeof fse.unlink>).mockReturnValue(Promise.resolve() as any);
@@ -138,7 +138,7 @@ describe("Extensions", () => {
     expect(container.querySelector(".Spinner")).toBeInTheDocument();
   });
 
-  it("does not display the spinner while extensions are not loading", async () => {
+  it("does not display the spinner while extensions are not loading", () => {
     extensionDiscovery.isLoaded = true;
     const { container } = render(<Extensions />);
 

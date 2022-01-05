@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 
-import type { LensApiRequest } from "../router";
+import type { LensApiRequest } from "../router/router";
 import { respondJson } from "../utils/http-responses";
 import type { Cluster } from "../../common/cluster/cluster";
 import { ClusterMetadataKey, ClusterPrometheusMetadata } from "../../common/cluster-types";
@@ -19,11 +19,11 @@ export type IMetricsQuery = string | string[] | {
 const ATTEMPTS = [false, false, false, false, true];
 
 // prometheus metrics loader
-async function loadMetrics(promQueries: string[], cluster: Cluster, prometheusPath: string, queryParams: Record<string, string>): Promise<any[]> {
+function loadMetrics(promQueries: string[], cluster: Cluster, prometheusPath: string, queryParams: Record<string, string>): Promise<any[]> {
   const queries = promQueries.map(p => p.trim());
   const loaders = new Map<string, Promise<any>>();
 
-  async function loadMetric(query: string): Promise<any> {
+  function loadMetric(query: string): Promise<any> {
     async function loadMetricHelper(): Promise<any> {
       for (const [attempt, lastAttempt] of ATTEMPTS.entries()) { // retry
         try {
@@ -97,7 +97,7 @@ export class MetricsRoute {
     }
   }
 
-  static async routeMetricsProviders({ response }: LensApiRequest) {
+  static routeMetricsProviders({ response }: LensApiRequest) {
     const providers: MetricProviderInfo[] = [];
 
     for (const { name, id, isConfigurable } of PrometheusProviderRegistry.getInstance().providers.values()) {

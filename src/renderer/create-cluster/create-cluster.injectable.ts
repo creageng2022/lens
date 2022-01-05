@@ -5,7 +5,7 @@
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import type { ClusterModel } from "../../common/cluster-types";
 import { Cluster } from "../../common/cluster/cluster";
-import directoryForKubeConfigsInjectable from "../../common/app-paths/directory-for-kube-configs/directory-for-kube-configs.injectable";
+import directoryForKubeConfigsInjectable from "../../common/app-paths/directory-for-kube-configs.injectable";
 import { createClusterInjectionToken } from "../../common/cluster/create-cluster-injection-token";
 
 const createClusterInjectable = getInjectable({

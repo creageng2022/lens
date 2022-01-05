@@ -7,7 +7,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import { SubTitle } from "../layout/sub-title";
 import { Select, SelectOption } from "../select";
-import { ThemeStore } from "../../theme.store";
+import { ThemeStore } from "../../theme-store/theme.store";
 import { UserStore } from "../../../common/user-store";
 import { Input } from "../input";
 import { isWindows } from "../../../common/vars";

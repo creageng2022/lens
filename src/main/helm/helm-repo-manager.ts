@@ -137,14 +137,14 @@ export class HelmRepoManager extends Singleton {
     }
   }
 
-  public static async update() {
+  public static update() {
     return execHelm([
       "repo",
       "update",
     ]);
   }
 
-  public static async addRepo({ name, url }: HelmRepo) {
+  public static addRepo({ name, url }: HelmRepo) {
     logger.info(`[HELM]: adding repo "${name}" from ${url}`);
 
     return execHelm([
@@ -155,7 +155,7 @@ export class HelmRepoManager extends Singleton {
     ]);
   }
 
-  public static async addCustomRepo({ name, url, insecureSkipTlsVerify, username, password, caFile, keyFile, certFile }: HelmRepo) {
+  public static addCustomRepo({ name, url, insecureSkipTlsVerify, username, password, caFile, keyFile, certFile }: HelmRepo) {
     logger.info(`[HELM]: adding repo ${name} from ${url}`);
     const args = [
       "repo",
@@ -191,7 +191,7 @@ export class HelmRepoManager extends Singleton {
     return execHelm(args);
   }
 
-  public static async removeRepo({ name, url }: HelmRepo): Promise<string> {
+  public static removeRepo({ name, url }: HelmRepo): Promise<string> {
     logger.info(`[HELM]: removing repo ${name} (${url})`);
 
     return execHelm([

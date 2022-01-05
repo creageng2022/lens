@@ -5,7 +5,7 @@
 
 import { action, comparer, observable, makeObservable } from "mobx";
 import { BaseStore } from "./base-store";
-import migrations from "../migrations/weblinks-store";
+import migrations from "./migrations/weblinks-store";
 import * as uuid from "uuid";
 import { toJS } from "./utils";
 

@@ -53,7 +53,7 @@ async function getMapEntry({ filePath, ...data }: KubeconfigSyncEntry): Promise<
   }
 }
 
-export async function getAllEntries(filePaths: string[]): Promise<[string, Value][]> {
+export function getAllEntries(filePaths: string[]): Promise<[string, Value][]> {
   return Promise.all(filePaths.map(filePath => getMapEntry({ filePath })));
 }
 

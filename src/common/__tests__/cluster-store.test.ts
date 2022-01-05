@@ -11,7 +11,7 @@ import type { Cluster } from "../cluster/cluster";
 import { ClusterStore } from "../cluster-store/cluster-store";
 import { Console } from "console";
 import { stdout, stderr } from "process";
-import getCustomKubeConfigDirectoryInjectable from "../app-paths/get-custom-kube-config-directory/get-custom-kube-config-directory.injectable";
+import getCustomKubeConfigDirectoryInjectable from "../app-paths/get-custom-kube-config-directory.injectable";
 import clusterStoreInjectable from "../cluster-store/cluster-store.injectable";
 import type { ClusterModel } from "../cluster-types";
 import type {
@@ -23,7 +23,7 @@ import { getDisForUnitTesting } from "../../test-utils/get-dis-for-unit-testing"
 import { createClusterInjectionToken } from "../cluster/create-cluster-injection-token";
 
 import directoryForUserDataInjectable
-  from "../app-paths/directory-for-user-data/directory-for-user-data.injectable";
+  from "../app-paths/directory-for-user-data.injectable";
 
 console = new Console(stdout, stderr);
 
@@ -100,7 +100,7 @@ describe("cluster-store", () => {
   describe("empty config", () => {
     let getCustomKubeConfigDirectory: (directoryName: string) => string;
 
-    beforeEach(async () => {
+    beforeEach(() => {
       getCustomKubeConfigDirectory = mainDi.inject(
         getCustomKubeConfigDirectoryInjectable,
       );
@@ -143,7 +143,7 @@ describe("cluster-store", () => {
         clusterStore.addCluster(cluster);
       });
 
-      it("adds new cluster to store", async () => {
+      it("adds new cluster to store", () => {
         const storedCluster = clusterStore.getById("foo");
 
         expect(storedCluster.id).toBe("foo");
@@ -251,7 +251,7 @@ describe("cluster-store", () => {
       expect(storedCluster.preferences.terminalCWD).toBe("/foo");
     });
 
-    it("allows getting all of the clusters", async () => {
+    it("allows getting all of the clusters", () => {
       const storedClusters = clusterStore.clustersList;
 
       expect(storedClusters.length).toBe(3);
@@ -368,13 +368,13 @@ users:
       mockFs.restore();
     });
 
-    it("migrates to modern format with kubeconfig in a file", async () => {
+    it("migrates to modern format with kubeconfig in a file", () => {
       const config = clusterStore.clustersList[0].kubeConfigPath;
 
       expect(fs.readFileSync(config, "utf8")).toBe(minimalValidKubeConfig);
     });
 
-    it("migrates to modern format with icon not in file", async () => {
+    it("migrates to modern format with icon not in file", () => {
       const { icon } = clusterStore.clustersList[0].preferences;
 
       expect(icon.startsWith("data:;base64,")).toBe(true);

@@ -22,7 +22,7 @@ export class BaseClusterDetector {
     return null;
   }
 
-  protected async k8sRequest<T = any>(path: string, options: RequestPromiseOptions = {}): Promise<T> {
+  protected k8sRequest<T = any>(path: string, options: RequestPromiseOptions = {}): Promise<T> {
     return k8sRequest(this.cluster, path, options);
   }
 }

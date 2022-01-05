@@ -2,18 +2,18 @@
  * Copyright (c) OpenLens Authors. All rights reserved.
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
- 
+
 
 import { ipcMain, ipcRenderer, webFrame } from "electron";
 import { action, comparer, computed, makeObservable, observable, reaction } from "mobx";
 import { BaseStore } from "../base-store";
 import { Cluster } from "../cluster/cluster";
-import migrations from "../../migrations/cluster-store";
 import logger from "../../main/logger";
 import { appEventBus } from "../app-event-bus/event-bus";
 import { ipcMainHandle, requestMain } from "../ipc";
 import { disposer, toJS } from "../utils";
 import type { ClusterModel, ClusterId, ClusterState } from "../cluster-types";
+import type { Migrations } from "conf/dist/source/types";
 
 export interface ClusterStoreModel {
   clusters?: ClusterModel[];
@@ -22,7 +22,8 @@ export interface ClusterStoreModel {
 const initialStates = "cluster:states";
 
 interface Dependencies {
-  createCluster: (model: ClusterModel) => Cluster
+  createCluster: (model: ClusterModel) => Cluster;
+  migrations: Migrations<ClusterStoreModel>;
 }
 
 export class ClusterStore extends BaseStore<ClusterStoreModel> {
@@ -38,7 +39,7 @@ export class ClusterStore extends BaseStore<ClusterStoreModel> {
       syncOptions: {
         equals: comparer.structural,
       },
-      migrations,
+      migrations: dependencies.migrations,
     });
 
     makeObservable(this);
@@ -103,9 +104,9 @@ export class ClusterStore extends BaseStore<ClusterStoreModel> {
     return this.clusters.size > 0;
   }
 
-  getById(id: ClusterId): Cluster | null {
+  getById = (id: ClusterId): Cluster | null => {
     return this.clusters.get(id) ?? null;
-  }
+  };
 
   addCluster(clusterOrModel: ClusterModel | Cluster): Cluster {
     appEventBus.emit({ name: "cluster", action: "add" });

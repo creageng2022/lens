@@ -9,7 +9,7 @@ import { Redirect, Route, Router, Switch } from "react-router";
 import { history } from "../../navigation";
 import { UserManagement } from "../../components/+user-management/user-management";
 import { ConfirmDialog } from "../../components/confirm-dialog";
-import { ClusterOverview } from "../../components/+cluster/cluster-overview";
+import { ClusterOverview } from "../../components/+cluster/overview";
 import { Events } from "../../components/+events/events";
 import { DeploymentScaleDialog } from "../../components/+workloads-deployments/deployment-scale-dialog";
 import { CronJobTriggerDialog } from "../../components/+workloads-cronjobs/cronjob-trigger-dialog";

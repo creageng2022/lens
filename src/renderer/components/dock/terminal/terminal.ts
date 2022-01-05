@@ -7,18 +7,19 @@ import debounce from "lodash/debounce";
 import { reaction } from "mobx";
 import { Terminal as XTerm } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
-import type { DockStore, TabId } from "../dock-store/dock.store";
+import type { DockStore, TabId } from "../store";
 import { TerminalApi, TerminalChannels } from "../../../api/terminal-api";
-import { ThemeStore } from "../../../theme.store";
+import { ThemeStore } from "../../../theme-store/theme.store";
 import { disposer } from "../../../utils";
 import { isMac } from "../../../../common/vars";
 import { once } from "lodash";
 import { UserStore } from "../../../../common/user-store";
 import { clipboard } from "electron";
 import logger from "../../../../common/logger";
+import fontPath from "../../fonts/roboto-mono-nerd.ttf";
 
 interface Dependencies {
-  dockStore: DockStore
+  dockStore: DockStore;
 }
 
 export class Terminal {
@@ -27,7 +28,6 @@ export class Terminal {
   }
 
   static async preloadFonts() {
-    const fontPath = require("../../fonts/roboto-mono-nerd.ttf").default; // eslint-disable-line @typescript-eslint/no-var-requires
     const fontFace = new FontFace("RobotoMono", `url(${fontPath})`);
 
     await fontFace.load();
@@ -42,7 +42,7 @@ export class Terminal {
   });
   private readonly fitAddon = new FitAddon();
   private scrollPos = 0;
-  private disposer = disposer();
+  private readonly disposer = disposer();
 
   get elem() {
     return this.xterm?.element;
@@ -71,7 +71,7 @@ export class Terminal {
     }
   }
 
-  constructor(private dependencies: Dependencies, public tabId: TabId, protected api: TerminalApi) {
+  constructor(public readonly tabId: TabId, protected readonly terminalApi: TerminalApi, protected readonly dependencies: Dependencies) {
     // enable terminal addons
     this.xterm.loadAddon(this.fitAddon);
 
@@ -86,9 +86,9 @@ export class Terminal {
 
     this.viewport.addEventListener("scroll", this.onScroll);
     this.elem.addEventListener("contextmenu", this.onContextMenu);
-    this.api.once("ready", clearOnce);
-    this.api.once("connected", clearOnce);
-    this.api.on("data", this.onApiData);
+    this.terminalApi.once("ready", clearOnce);
+    this.terminalApi.once("connected", clearOnce);
+    this.terminalApi.on("data", this.onApiData);
     window.addEventListener("resize", this.onResize);
 
     this.disposer.push(
@@ -97,10 +97,10 @@ export class Terminal {
       }, {
         fireImmediately: true,
       }),
-      dependencies.dockStore.onResize(this.onResize),
+      this.dependencies.dockStore.onResize(this.onResize),
       () => onDataHandler.dispose(),
       () => this.fitAddon.dispose(),
-      () => this.api.removeAllListeners(),
+      () => this.terminalApi.removeAllListeners(),
       () => window.removeEventListener("resize", this.onResize),
       () => this.elem.removeEventListener("contextmenu", this.onContextMenu),
     );
@@ -124,7 +124,7 @@ export class Terminal {
       this.fitAddon.fit();
       const { cols, rows } = this.xterm;
 
-      this.api.sendTerminalSize(cols, rows);
+      this.terminalApi.sendTerminalSize(cols, rows);
     } catch (error) {
       // see https://github.com/lensapp/lens/issues/1891
       logger.error(`[TERMINAL]: failed to resize terminal to fit`, error);
@@ -142,8 +142,8 @@ export class Terminal {
   };
 
   onData = (data: string) => {
-    if (!this.api.isReady) return;
-    this.api.sendMessage({
+    if (!this.terminalApi.isReady) return;
+    this.terminalApi.sendMessage({
       type: TerminalChannels.STDIN,
       data,
     });

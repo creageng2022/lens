@@ -10,11 +10,15 @@ import type { KubeConfig } from "@kubernetes/client-node";
 import type { Cluster } from "../../../common/cluster/cluster";
 import { ShellOpenError, ShellSession } from "../shell-session";
 import { get } from "lodash";
-import { Node, NodesApi } from "../../../common/k8s-api/endpoints";
-import { KubeJsonApi } from "../../../common/k8s-api/kube-json-api";
+import { Node, NodeApi } from "../../../common/k8s-api/endpoints";
+import type { KubeJsonApi } from "../../../common/k8s-api/kube-json-api";
 import logger from "../../logger";
 import { TerminalChannels } from "../../../renderer/api/terminal-api";
 import type { Kubectl } from "../../kubectl/kubectl";
+
+export interface NodeShellSessionDependencies {
+  createKubeJsonApiForCluster: (clusterId: string) => KubeJsonApi;
+}
 
 export class NodeShellSession extends ShellSession {
   ShellType = "node-shell";
@@ -24,7 +28,7 @@ export class NodeShellSession extends ShellSession {
 
   protected readonly cwd: string | undefined = undefined;
 
-  constructor(protected nodeName: string, kubectl: Kubectl, socket: WebSocket, cluster: Cluster, terminalId: string) {
+  constructor(protected nodeName: string, kubectl: Kubectl, socket: WebSocket, cluster: Cluster, terminalId: string, protected readonly dependencies: NodeShellSessionDependencies) {
     super(kubectl, socket, cluster, terminalId);
   }
 
@@ -47,9 +51,9 @@ export class NodeShellSession extends ShellSession {
 
     const env = await this.getCachedShellEnv();
     const args = ["exec", "-i", "-t", "-n", "kube-system", this.podName, "--"];
-    const nodeApi = new NodesApi({
+    const nodeApi = new NodeApi({
       objectConstructor: Node,
-      request: KubeJsonApi.forCluster(this.cluster.id),
+      request: this.dependencies.createKubeJsonApiForCluster(this.cluster.id),
     });
     const node = await nodeApi.get({ name: this.nodeName });
     const nodeOs = node.getOperatingSystem();

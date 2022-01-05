@@ -9,14 +9,14 @@ import { fireEvent } from "@testing-library/react";
 import React from "react";
 import type { DependencyInjectionContainer } from "@ogre-tools/injectable";
 import { getDiForUnitTesting } from "../../../getDiForUnitTesting";
-import { DiRender, renderFor } from "../../test-utils/renderFor";
-import hotbarManagerInjectable from "../../../../common/hotbar-store.injectable";
-import { ThemeStore } from "../../../theme.store";
-import { ConfirmDialog } from "../../confirm-dialog";
-import type { HotbarStore } from "../../../../common/hotbar-store";
+import { type DiRender, renderFor } from "../../test-utils/renderFor";
+import hotbarManagerInjectable from "../../../../common/hotbar-store/store.injectable";
 import { UserStore } from "../../../../common/user-store";
+import { ThemeStore } from "../../../theme-store/theme.store";
+import { ConfirmDialog } from "../../confirm-dialog";
+import type { HotbarStore } from "../../../../common/hotbar-store/store";
 import mockFs from "mock-fs";
-import directoryForUserDataInjectable from "../../../../common/app-paths/directory-for-user-data/directory-for-user-data.injectable";
+import directoryForUserDataInjectable from "../../../../common/app-paths/directory-for-user-data.injectable";
 
 const mockHotbars: { [id: string]: any } = {
   "1": {

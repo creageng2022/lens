@@ -461,7 +461,7 @@ export class Cluster implements ClusterModel, ClusterState {
   /**
    * @internal
    */
-  async getProxyKubeconfigPath(): Promise<string> {
+  getProxyKubeconfigPath(): Promise<string> {
     return this.proxyKubeconfigManager.getPath();
   }
 
@@ -531,7 +531,7 @@ export class Cluster implements ClusterModel, ClusterState {
   /**
    * @internal
    */
-  async isClusterAdmin(): Promise<boolean> {
+  isClusterAdmin(): Promise<boolean> {
     return this.canI({
       namespace: "kube-system",
       resource: "*",
@@ -542,7 +542,7 @@ export class Cluster implements ClusterModel, ClusterState {
   /**
    * @internal
    */
-  async canUseWatchApi(customizeResource: V1ResourceAttributes = {}): Promise<boolean> {
+  canUseWatchApi(customizeResource: V1ResourceAttributes = {}): Promise<boolean> {
     return this.canI({
       verb: "watch",
       resource: "*",
@@ -697,9 +697,9 @@ export class Cluster implements ClusterModel, ClusterState {
     return true; // allowed by default for other resources
   }
 
-  isMetricHidden(resource: ClusterMetricsResourceType): boolean {
+  isMetricHidden = (resource: ClusterMetricsResourceType): boolean => {
     return Boolean(this.preferences.hiddenMetrics?.includes(resource));
-  }
+  };
 
   get nodeShellImage(): string {
     return this.preferences?.nodeShellImage || initialNodeShellImage;

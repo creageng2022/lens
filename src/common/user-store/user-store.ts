@@ -7,22 +7,27 @@ import { app, ipcMain } from "electron";
 import semver, { SemVer } from "semver";
 import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { BaseStore } from "../base-store";
-import migrations, { fileNameMigration } from "../../migrations/user-store";
 import { getAppVersion } from "../utils/app-version";
 import { kubeConfigDefaultPath } from "../kube-helpers";
 import { appEventBus } from "../app-event-bus/event-bus";
 import { ObservableToggleSet, toJS } from "../../renderer/utils";
 import { DESCRIPTORS, EditorConfiguration, ExtensionRegistry, KubeconfigSyncValue, UserPreferencesModel } from "./preferences-helpers";
 import logger from "../../main/logger";
+import type { Migrations } from "conf/dist/source/types";
 
 export interface UserStoreModel {
   lastSeenAppVersion: string;
   preferences: UserPreferencesModel;
 }
 
+interface UserStoreDependencies {
+  migrations: Migrations<UserStoreModel>;
+  fileNameMigration: () => void;
+}
+
 export class UserStore extends BaseStore<UserStoreModel> /* implements UserStoreFlatModel (when strict null is enabled) */ {
   readonly displayName = "UserStore";
-  constructor() {
+  constructor({ migrations, fileNameMigration }: UserStoreDependencies) {
     super({
       configName: "lens-user-store",
       migrations,
@@ -118,7 +123,7 @@ export class UserStore extends BaseStore<UserStoreModel> /* implements UserStore
    * @param columnIds The list of IDs the check if one is hidden
    * @returns true if at least one column under the table is set to hidden
    */
-  isTableColumnHidden(tableId: string, ...columnIds: string[]): boolean {
+  isTableColumnHidden = (tableId: string, ...columnIds: string[]): boolean => {
     if (columnIds.length === 0) {
       return false;
     }
@@ -130,19 +135,19 @@ export class UserStore extends BaseStore<UserStoreModel> /* implements UserStore
     }
 
     return columnIds.some(columnId => config.has(columnId));
-  }
+  };
 
   @action
   /**
    * Toggles the hidden configuration of a table's column
    */
-  toggleTableColumnVisibility(tableId: string, columnId: string) {
+  toggleTableColumnVisibility = (tableId: string, columnId: string) => {
     if (!this.hiddenTableColumns.get(tableId)) {
       this.hiddenTableColumns.set(tableId, new ObservableToggleSet());
     }
 
     this.hiddenTableColumns.get(tableId).toggle(columnId);
-  }
+  };
 
   @action
   resetTheme() {

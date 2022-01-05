@@ -96,7 +96,7 @@ export class PortForward {
     }
   }
 
-  public async stop() {
+  public stop() {
     this.process.kill();
   }
 }

@@ -4,10 +4,10 @@
  */
 
 import React from "react";
+import type { CatalogEntity } from "../../../common/catalog";
 import type { KubernetesCluster } from "../../../common/catalog-entities";
 import { ClusterStore } from "../../../common/cluster-store/cluster-store";
 import type { EntitySettingViewProps } from "../../../extensions/registries";
-import type { CatalogEntity } from "../../api/catalog-entity";
 import * as components from "./components";
 
 function getClusterForEntity(entity: CatalogEntity) {

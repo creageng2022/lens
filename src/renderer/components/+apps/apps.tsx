@@ -6,8 +6,8 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { TabLayout, TabLayoutRoute } from "../layout/tab-layout";
-import { HelmCharts } from "../+apps-helm-charts";
-import { HelmReleases } from "../+apps-releases";
+import { HelmCharts } from "../+helm-charts";
+import { HelmReleases } from "../+helm-releases";
 import { helmChartsURL, helmChartsRoute, releaseURL, releaseRoute } from "../../../common/routes";
 
 @observer

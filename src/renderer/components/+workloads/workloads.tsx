@@ -8,14 +8,14 @@ import "./workloads.scss";
 import React from "react";
 import { TabLayout, TabLayoutRoute } from "../layout/tab-layout";
 import { WorkloadsOverview } from "../+workloads-overview/overview";
-import { Pods } from "../+workloads-pods";
-import { Deployments } from "../+workloads-deployments";
-import { DaemonSets } from "../+workloads-daemonsets";
-import { StatefulSets } from "../+workloads-statefulsets";
-import { Jobs } from "../+workloads-jobs";
-import { CronJobs } from "../+workloads-cronjobs";
+import { Pods } from "../+pods";
+import { Deployments } from "../+deployments";
+import { DaemonSets } from "../+daemonsets";
+import { StatefulSets } from "../+stateful-sets";
+import { Jobs } from "../+jobs";
+import { CronJobs } from "../+cronjobs";
 import { isAllowedResource } from "../../../common/utils/allowed-resource";
-import { ReplicaSets } from "../+workloads-replicasets";
+import { ReplicaSets } from "../+replica-sets";
 import * as routes from "../../../common/routes";
 
 export class Workloads extends React.Component {

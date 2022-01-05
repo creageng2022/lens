@@ -29,7 +29,7 @@ import { stdout, stderr } from "process";
 import { getDisForUnitTesting } from "../../test-utils/get-dis-for-unit-testing";
 import userStoreInjectable from "../user-store/user-store.injectable";
 import type { DependencyInjectionContainer } from "@ogre-tools/injectable";
-import directoryForUserDataInjectable from "../app-paths/directory-for-user-data/directory-for-user-data.injectable";
+import directoryForUserDataInjectable from "../app-paths/directory-for-user-data.injectable";
 import type { ClusterStoreModel } from "../cluster-store/cluster-store";
 import { defaultTheme } from "../vars";
 
@@ -82,7 +82,7 @@ describe("user store tests", () => {
       expect(userStore.colorTheme).toBe("light");
     });
 
-    it("correctly resets theme to default value", async () => {
+    it("correctly resets theme to default value", () => {
       userStore.colorTheme = "some other theme";
       userStore.resetTheme();
       expect(userStore.colorTheme).toBe(defaultTheme);
