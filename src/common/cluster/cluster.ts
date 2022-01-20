@@ -13,19 +13,20 @@ import type { KubeconfigManager } from "../../main/kubeconfig-manager/kubeconfig
 import { loadConfigFromFile, loadConfigFromFileSync, validateKubeConfig } from "../kube-helpers";
 import { apiResourceRecord, apiResources, KubeApiResource, KubeResource } from "../rbac";
 import logger from "../../main/logger";
-import { VersionDetector } from "../../main/cluster-detectors/version-detector";
-import { DetectorRegistry } from "../../main/cluster-detectors/detector-registry";
 import plimit from "p-limit";
 import type { ClusterState, ClusterRefreshOptions, ClusterMetricsResourceType, ClusterId, ClusterMetadata, ClusterModel, ClusterPreferences, ClusterPrometheusPreferences, UpdateClusterModel, KubeAuthUpdate } from "../cluster-types";
 import { ClusterMetadataKey, initialNodeShellImage, ClusterStatus } from "../cluster-types";
 import { disposer, toJS } from "../utils";
 import type { Response } from "request";
+import type { ClusterDetectionResult } from "../../main/cluster-detectors/base-cluster-detector";
 
-interface Dependencies {
-  directoryForKubeConfigs: string,
-  createKubeconfigManager: (cluster: Cluster) => KubeconfigManager,
-  createContextHandler: (cluster: Cluster) => ContextHandler,
-  createKubectl: (clusterVersion: string) => Kubectl
+export interface ClusterDependencies {
+  directoryForKubeConfigs: string;
+  createKubeconfigManager: (cluster: Cluster) => KubeconfigManager;
+  createContextHandler: (cluster: Cluster) => ContextHandler;
+  createKubectl: (clusterVersion: string) => Kubectl;
+  detectMetadataForCluster: (cluster: Cluster) => Promise<ClusterMetadata>;
+  detectVersion: (cluster: Cluster) => Promise<ClusterDetectionResult>;
 }
 
 /**
@@ -212,7 +213,7 @@ export class Cluster implements ClusterModel, ClusterState {
     return this.preferences.defaultNamespace;
   }
 
-  constructor(private dependencies: Dependencies, model: ClusterModel) {
+  constructor(private readonly dependencies: ClusterDependencies, model: ClusterModel) {
     makeObservable(this);
     this.id = model.id;
     this.updateModel(model);
@@ -414,7 +415,7 @@ export class Cluster implements ClusterModel, ClusterState {
   @action
   async refreshMetadata() {
     logger.info(`[CLUSTER]: refreshMetadata`, this.getMeta());
-    const metadata = await DetectorRegistry.getInstance().detectForCluster(this);
+    const metadata = await this.dependencies.detectMetadataForCluster(this);
     const existingMetadata = this.metadata;
 
     this.metadata = Object.assign(existingMetadata, metadata);
@@ -467,10 +468,9 @@ export class Cluster implements ClusterModel, ClusterState {
 
   protected async getConnectionStatus(): Promise<ClusterStatus> {
     try {
-      const versionDetector = new VersionDetector(this);
-      const versionData = await versionDetector.detect();
+      const { value } = await this.dependencies.detectVersion(this);
 
-      this.metadata.version = versionData.value;
+      this.metadata.version = value;
 
       return ClusterStatus.AccessGranted;
     } catch (error) {

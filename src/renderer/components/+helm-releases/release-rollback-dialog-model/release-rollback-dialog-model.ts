@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { computed, observable, makeObservable, action } from "mobx";
-import type { HelmRelease } from "../../../../common/k8s-api/endpoints/helm-releases.api";
+import type { HelmRelease } from "../../../../common/k8s-api/endpoints";
 
 export class ReleaseRollbackDialogModel {
   release: HelmRelease | null = null;

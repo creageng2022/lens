@@ -3,10 +3,15 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import { UserStore } from "../../../common/user-store";
+import { computed } from "mobx";
+import userStoreInjectable from "../../../common/user-store/store.injectable";
 
 const localeTimezoneInjectable = getInjectable({
-  instantiate: () => UserStore.getInstance().localeTimezone,
+  instantiate: (di) => {
+    const userStore = di.inject(userStoreInjectable);
+
+    return computed(() => userStore.localeTimezone);
+  },
   lifecycle: lifecycleEnum.singleton,
 });
 

@@ -41,7 +41,7 @@ const NonInjectedEditorPanel = observer(({
   autoFocus = true,
   className,
 }: Dependencies & EditorPanelProps) => {
-  const editor = useRef<MonacoEditor>();
+  const editor = useRef<React.ElementRef<typeof MonacoEditor>>();
 
   useEffect(() => disposer(
     // keep focus on editor's area when <Dock/> just opened

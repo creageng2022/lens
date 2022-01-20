@@ -42,7 +42,6 @@ import { bundledKubectlPath, Kubectl } from "../kubectl/kubectl";
 import { mock, MockProxy } from "jest-mock-extended";
 import { waitUntilUsed } from "tcp-port-used";
 import { EventEmitter, Readable } from "stream";
-import { UserStore } from "../../common/user-store";
 import { Console } from "console";
 import { stdout, stderr } from "process";
 import mockFs from "mock-fs";
@@ -96,14 +95,10 @@ describe("kube auth proxy tests", () => {
     await di.runSetups();
 
     createCluster = di.inject(createClusterInjectionToken);
-
     createKubeAuthProxy = di.inject(createKubeAuthProxyInjectable);
-
-    UserStore.createInstance();
   });
 
   afterEach(() => {
-    UserStore.resetInstance();
     mockFs.restore();
   });
 

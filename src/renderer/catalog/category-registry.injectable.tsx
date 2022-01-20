@@ -7,7 +7,6 @@ import { readFile } from "fs/promises";
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { CatalogCategoryRegistry } from "../../common/catalog";
 import { loadConfigFromString } from "../../common/kube-helpers";
-import { DeleteClusterDialog } from "../components/delete-cluster-dialog";
 import React from "react";
 import { WeblinkAddCommand } from "../components/catalog-entities/weblink-add-command";
 import openCommandDialogInjectable from "../components/command-palette/open-command-dialog.injectable";
@@ -23,6 +22,7 @@ import { multiSet } from "../utils";
 import removeWeblinkByIdInjectable from "../../common/weblinks/remove-by-id.injectable";
 import userStoreInjectable from "../../common/user-store/store.injectable";
 import getClusterByIdInjectable from "../../common/cluster-store/get-cluster-by-id.injectable";
+import openDeleteClusterDialogInjectable from "../components/delete-cluster-dialog/open-delete-cluster-dialog.injectable";
 
 const catalogCategoryRegistryInjectable = getInjectable({
   instantiate: (di) => {
@@ -30,6 +30,7 @@ const catalogCategoryRegistryInjectable = getInjectable({
     const removeWeblinkById = di.inject(removeWeblinkByIdInjectable);
     const userStore = di.inject(userStoreInjectable);
     const getClusterById = di.inject(getClusterByIdInjectable);
+    const openDeleteClusterDialog = di.inject(openDeleteClusterDialogInjectable);
 
     const addSyncEntries = async (filePaths: string[]) => {
       const entries = await getAllEntries(filePaths);
@@ -59,7 +60,7 @@ const catalogCategoryRegistryInjectable = getInjectable({
         throw error;
       }
 
-      DeleteClusterDialog.open({ cluster, config });
+      openDeleteClusterDialog(cluster, config);
     };
 
     const registry = new CatalogCategoryRegistry();

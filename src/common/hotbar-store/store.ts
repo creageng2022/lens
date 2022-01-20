@@ -158,12 +158,11 @@ export class HotbarStore extends BaseStore<HotbarStoreModel> {
    * @param uid The `EntityId` that each hotbar item refers to
    * @returns A function that will (in an action) undo the removing of the hotbar items. This function will not complete if the hotbar has changed.
    */
-  @action
-  removeAllHotbarItems(uid: string) {
+  removeAllHotbarItems = action((uid: string) => {
     for (const hotbar of this.hotbars) {
       hotbar.removeItemById(uid);
     }
-  }
+  });
 
   switchToPrevious() {
     let index = this.activeHotbarIndex - 1;

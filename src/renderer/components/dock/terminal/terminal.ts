@@ -16,7 +16,7 @@ import { clipboard } from "electron";
 import logger from "../../../../common/logger";
 import fontPath from "../../fonts/roboto-mono-nerd.ttf";
 
-interface Dependencies {
+export interface TerminalDependencies {
   readonly dockStore: DockStore;
   readonly terminalColors: IComputedValue<Record<string, string>>;
   readonly terminalCopyOnSelect: IComputedValue<boolean>;
@@ -71,7 +71,7 @@ export class Terminal {
     }
   }
 
-  constructor(public readonly tabId: TabId, protected readonly terminalApi: TerminalApi, protected readonly dependencies: Dependencies) {
+  constructor(protected readonly dependencies: TerminalDependencies, public readonly tabId: TabId, protected readonly terminalApi: TerminalApi) {
     // enable terminal addons
     this.xterm.loadAddon(this.fitAddon);
 

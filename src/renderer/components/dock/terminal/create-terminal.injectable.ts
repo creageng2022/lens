@@ -3,19 +3,22 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import { Terminal } from "./terminal";
+import { Terminal, TerminalDependencies } from "./terminal";
 import type { TabId } from "../store";
 import type { TerminalApi } from "../../../api/terminal-api";
 import dockStoreInjectable from "../store.injectable";
+import terminalColorsInjectable from "../../../themes/terminal-colors.injectable";
+import terminalCopyOnSelectInjectable from "../../../../common/user-store/terminal-copy-on-select.injectable";
 
 const createTerminalInjectable = getInjectable({
   instantiate: (di) => {
-    const dependencies = {
+    const dependencies: TerminalDependencies = {
       dockStore: di.inject(dockStoreInjectable),
+      terminalColors: di.inject(terminalColorsInjectable),
+      terminalCopyOnSelect: di.inject(terminalCopyOnSelectInjectable),
     };
 
-    return (tabId: TabId, api: TerminalApi) =>
-      new Terminal(dependencies, tabId, api);
+    return (tabId: TabId, api: TerminalApi) => new Terminal(dependencies, tabId, api);
   },
 
   lifecycle: lifecycleEnum.singleton,

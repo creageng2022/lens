@@ -2,10 +2,10 @@
  * Copyright (c) OpenLens Authors. All rights reserved.
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
-import terminalStoreInjectable from "../../renderer/components/dock/terminal-store/terminal-store.injectable";
+import terminalStoreInjectable from "../../renderer/components/dock/terminals/store.injectable";
 import { asLegacyGlobalObjectForExtensionApi } from "../as-legacy-globals-for-extension-api/as-legacy-global-object-for-extension-api";
 import { asLegacyGlobalSingletonForExtensionApi } from "../as-legacy-globals-for-extension-api/as-legacy-global-singleton-for-extension-api";
-import { TerminalStore as TerminalStoreClass } from "../../renderer/components/dock/terminal-store/terminal.store";
+import { TerminalStore as TerminalStoreClass } from "../../renderer/components/dock/terminals/store";
 import commandOverlayInjectable from "../../renderer/components/command-palette/command-overlay.injectable";
 import newTerminalTabInjectable from "../../renderer/components/dock/terminal/create-tab.injectable";
 import { ConfirmDialog as _ConfirmDialog } from "../../renderer/components/confirm-dialog";

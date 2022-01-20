@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import { TerminalStore } from "./terminal.store";
+import { TerminalStore } from "./store";
 import createTerminalTabInjectable from "../create-terminal-tab/create-terminal-tab.injectable";
 import dockStoreInjectable from "../store.injectable";
 import createTerminalInjectable from "../terminal/create-terminal.injectable";

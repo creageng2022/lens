@@ -85,7 +85,6 @@ describe("BaseStore", () => {
     await dis.runSetups();
 
     store = undefined;
-    TestStore.resetInstance();
 
     const mockOpts = {
       "some-user-data-directory": {
@@ -95,12 +94,11 @@ describe("BaseStore", () => {
 
     mockFs(mockOpts);
 
-    store = TestStore.createInstance();
+    store = new TestStore();
   });
 
   afterEach(() => {
     store.disableSync();
-    TestStore.resetInstance();
     mockFs.restore();
   });
 

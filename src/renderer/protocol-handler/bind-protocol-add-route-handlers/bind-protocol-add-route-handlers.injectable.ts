@@ -8,12 +8,14 @@ import { addInternalProtocolRouteHandlers } from "./bind-protocol-add-route-hand
 import lensProtocolRouterRendererInjectable from "../lens-protocol-router-renderer/lens-protocol-router-renderer.injectable";
 import getEntityByIdInjectable from "../../catalog/get-entity-by-id.injectable";
 import { bind } from "../../utils";
+import getClusterByIdInjectable from "../../../common/cluster-store/get-cluster-by-id.injectable";
 
 const addInternalProtocolRouteHandlersInjectable = getInjectable({
   instantiate: (di) => bind(addInternalProtocolRouteHandlers, null, {
     attemptInstallByInfo: di.inject(attemptInstallByInfoInjectable),
     lensProtocolRouterRenderer: di.inject(lensProtocolRouterRendererInjectable),
     getEntityById: di.inject(getEntityByIdInjectable),
+    getClusterById: di.inject(getClusterByIdInjectable),
   }),
 
   lifecycle: lifecycleEnum.singleton,

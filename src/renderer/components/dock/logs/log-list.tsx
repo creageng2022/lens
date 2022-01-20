@@ -15,7 +15,7 @@ import moment from "moment-timezone";
 import type { Align, ListOnScrollProps } from "react-window";
 
 import { LogSearchStore } from "../log-search/store";
-import { UserStore } from "../../../../common/user-store";
+import type { UserStore } from "../../../../common/user-store";
 import { array, cssNames, disposer } from "../../../utils";
 import { Spinner } from "../../spinner";
 import { VirtualList } from "../../virtual-list";
@@ -26,6 +26,7 @@ import { withInjectables } from "@ogre-tools/injectable-react";
 import logSearchStoreInjectable from "../log-search/store.injectable";
 import logTabStoreInjectable from "../log-tab/store.injectable";
 import logsStoreInjectable from "./store.injectable";
+import userStoreInjectable from "../../../../common/user-store/store.injectable";
 
 export interface LogListProps {
   logs: string[]
@@ -41,13 +42,14 @@ interface Dependencies {
   logSearchStore: LogSearchStore;
   logTabStore: LogTabStore;
   logsStore: LogsStore;
+  userStore: UserStore;
 }
 
 export interface LogListRef {
   scrollToItem: (index: number, align: Align) => void;
 }
 
-const NonInjectedLogList = observer(forwardRef<LogListRef, Dependencies & LogListProps>(({ logSearchStore, logTabStore, logs, isLoading, load, id, logsStore }: Dependencies & LogListProps, ref) => {
+const NonInjectedLogList = observer(forwardRef<LogListRef, Dependencies & LogListProps>(({ userStore, logSearchStore, logTabStore, logs, isLoading, load, id, logsStore }: Dependencies & LogListProps, ref) => {
   const [isJumpButtonVisible, setIsJumpButtonVisible] = useState(false);
   const [isLastLineVisible, setIsLastLineVisible] = useState(true);
   const virtualListDiv = useRef<HTMLDivElement>();
@@ -192,7 +194,7 @@ const NonInjectedLogList = observer(forwardRef<LogListRef, Dependencies & LogLis
 
     return logs
       .map(log => logsStore.splitOutTimestamp(log))
-      .map(([logTimestamp, log]) => (`${logTimestamp && moment.tz(logTimestamp, UserStore.getInstance().localeTimezone).format()}${log}`));
+      .map(([logTimestamp, log]) => (`${logTimestamp && moment.tz(logTimestamp, userStore.localeTimezone).format()}${log}`));
   })();
 
   const isInitLoading = isLoading && !logLines.length;
@@ -237,6 +239,7 @@ export const LogList = withInjectables<Dependencies, LogListProps>(NonInjectedLo
     logSearchStore: di.inject(logSearchStoreInjectable),
     logTabStore: di.inject(logTabStoreInjectable),
     logsStore: di.inject(logsStoreInjectable),
+    userStore: di.inject(userStoreInjectable),
     ...props,
   }),
-}) as React.ForwardRefExoticComponent<LogListProps & React.RefAttributes<LogListRef>>;
+});

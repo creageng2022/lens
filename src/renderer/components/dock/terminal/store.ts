@@ -5,7 +5,7 @@
 
 import { autorun, observable, when } from "mobx";
 import { autoBind, noop } from "../../../utils";
-import { Terminal } from "./terminal";
+import type { Terminal } from "./terminal";
 import { TerminalApi, TerminalChannels } from "../../../api/terminal-api";
 import { DockStore, DockTabData, DockTabCreateSpecific, TabId, TabKind } from "../store";
 import { WebSocketApiState } from "../../../api/websocket-api";
@@ -18,6 +18,7 @@ export interface ITerminalTab extends DockTabData {
 interface Dependencies {
   dockStore: DockStore;
   newTerminalTab: (tabParams?: DockTabCreateSpecific) => DockTabData;
+  createTerminal: (tabId: TabId, api: TerminalApi) => Terminal;
 }
 
 export class TerminalStore {
@@ -45,7 +46,7 @@ export class TerminalStore {
     });
   }
 
-  connect(tabId: TabId) {
+  async connect(tabId: TabId) {
     if (this.hasConnection(tabId)) {
       return;
     }
@@ -54,12 +55,11 @@ export class TerminalStore {
       id: tabId,
       node: tab.node,
     });
-    const terminal = new Terminal(tabId, api, this.dependencies);
 
     this.connections.set(tabId, api);
-    this.terminals.set(tabId, terminal);
+    this.terminals.set(tabId, this.dependencies.createTerminal(tabId, api));
 
-    api.connect();
+    await api.connect();
   }
 
   disconnect(tabId: TabId) {

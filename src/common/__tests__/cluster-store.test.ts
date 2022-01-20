@@ -8,7 +8,7 @@ import mockFs from "mock-fs";
 import path from "path";
 import fse from "fs-extra";
 import type { Cluster } from "../cluster/cluster";
-import { ClusterStore } from "../cluster-store/store";
+import type { ClusterStore } from "../cluster-store/store";
 import { Console } from "console";
 import { stdout, stderr } from "process";
 import getCustomKubeConfigDirectoryInjectable from "../app-paths/get-custom-kube-config-directory.injectable";
@@ -105,10 +105,6 @@ describe("cluster-store", () => {
         getCustomKubeConfigDirectoryInjectable,
       );
 
-      // TODO: Remove these by removing Singleton base-class from BaseStore
-      ClusterStore.getInstance(false)?.unregisterIpcListener();
-      ClusterStore.resetInstance();
-
       const mockOpts = {
         "some-directory-for-user-data": {
           "lens-cluster-store.json": JSON.stringify({}),
@@ -197,8 +193,6 @@ describe("cluster-store", () => {
 
   describe("config with existing clusters", () => {
     beforeEach(() => {
-      ClusterStore.resetInstance();
-
       const mockOpts = {
         "temp-kube-config": kubeconfig,
         "some-directory-for-user-data": {
@@ -285,8 +279,6 @@ users:
     token: kubeconfig-user-q4lm4:xxxyyyy
 `;
 
-      ClusterStore.resetInstance();
-
       const mockOpts = {
         "invalid-kube-config": invalidKubeconfig,
         "valid-kube-config": kubeconfig,
@@ -335,7 +327,6 @@ users:
 
   describe("pre 3.6.0-beta.1 config with an existing cluster", () => {
     beforeEach(() => {
-      ClusterStore.resetInstance();
       const mockOpts = {
         "some-directory-for-user-data": {
           "lens-cluster-store.json": JSON.stringify({

@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 
-@import "../+storage/storage-mixins";
+@import "../+storage/mixins";
 
 .VolumeDetailsList {
   position: relative;
@@ -12,7 +12,7 @@
     margin: 0 (-$margin * 3);
 
     &.virtual {
-      height: 500px;  // applicable for 100+ items
+      height: 500px; // applicable for 100+ items
     }
   }
 

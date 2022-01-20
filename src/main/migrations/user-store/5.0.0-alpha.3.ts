@@ -4,13 +4,14 @@
  */
 
 // Switch representation of hiddenTableColumns in store
+import type { UserStoreModel } from "../../../common/user-store";
 import type { MigrationDeclaration } from "../helpers";
 
 export default {
   version: "5.0.0-alpha.3",
   run(store) {
     const preferences = store.get("preferences");
-    const oldHiddenTableColumns: Record<string, string[]> = preferences?.hiddenTableColumns;
+    const oldHiddenTableColumns = preferences?.hiddenTableColumns as any as Record<string, string[]>;
 
     if (!oldHiddenTableColumns) {
       return;
@@ -20,4 +21,4 @@ export default {
 
     store.set("preferences", preferences);
   },
-} as MigrationDeclaration;
+} as MigrationDeclaration<UserStoreModel>;

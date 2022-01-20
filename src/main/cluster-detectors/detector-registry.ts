@@ -12,28 +12,28 @@ export interface DetectorRegistryDependencies extends BaseClusterDetectorDepende
 }
 
 export class DetectorRegistry {
-  registry = observable.array<new (cluster: Cluster, deps: BaseClusterDetectorDependencies) => BaseClusterDetector>([], { deep: false });
+  registry = observable.map<string, new (cluster: Cluster, deps: BaseClusterDetectorDependencies) => BaseClusterDetector>([], { deep: false });
 
   constructor(protected readonly dependencies: DetectorRegistryDependencies) {}
 
-  add(detectorClass: new (cluster: Cluster, deps: BaseClusterDetectorDependencies) => BaseClusterDetector) {
-    this.registry.push(detectorClass);
+  add(key: string, detectorClass: new (cluster: Cluster, deps: BaseClusterDetectorDependencies) => BaseClusterDetector) {
+    this.registry.set(key, detectorClass);
   }
 
-  async detectForCluster(cluster: Cluster): Promise<ClusterMetadata> {
+  detectForCluster = async (cluster: Cluster): Promise<ClusterMetadata> => {
     const results: { [key: string]: ClusterDetectionResult } = {};
 
-    for (const detectorClass of this.registry) {
+    for (const [key, detectorClass] of this.registry) {
       const detector = new detectorClass(cluster, this.dependencies);
 
       try {
         const data = await detector.detect();
 
         if (data) {
-          const existingValue = results[detector.key];
+          const existingValue = results[key];
 
           if (!existingValue || existingValue.accuracy <= data.accuracy) {
-            results[detector.key] = data;
+            results[key] = data;
           }
         }
       } catch (e) {
@@ -48,5 +48,11 @@ export class DetectorRegistry {
     }
 
     return metadata;
-  }
+  };
+
+  detectSpecificForCluster = (key: string, cluster: Cluster) => {
+    const detector = new (this.registry.get(key))(cluster, this.dependencies);
+
+    return detector.detect();
+  };
 }

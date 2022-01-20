@@ -17,6 +17,7 @@ import { getDisForUnitTesting } from "../../../../test-utils/get-dis-for-unit-te
 import { createClusterInjectionToken } from "../../../../common/cluster/create-cluster-injection-token";
 import type { DependencyInjectionContainer } from "@ogre-tools/injectable";
 import { type DiRender, renderFor } from "../../test-utils/renderFor";
+import deleteClusterDialogStateInjectable from "../state.injectable";
 
 jest.mock("electron", () => ({
   app: {
@@ -139,7 +140,8 @@ describe("<DeleteClusterDialog />", () => {
         kubeConfigPath: "./temp-kube-config",
       });
 
-      DeleteClusterDialog.open({ cluster, config });
+      di.override(deleteClusterDialogStateInjectable, () => ({ cluster, config }));
+
       const { getByText } = render(<DeleteClusterDialog />);
 
       const message = "The contents of kubeconfig file will be changed!";
@@ -157,7 +159,7 @@ describe("<DeleteClusterDialog />", () => {
         kubeConfigPath: "./temp-kube-config",
       });
 
-      DeleteClusterDialog.open({ cluster, config });
+      di.override(deleteClusterDialogStateInjectable, () => ({ cluster, config }));
 
       const { getByTestId } = render(<DeleteClusterDialog />);
 
@@ -174,7 +176,7 @@ describe("<DeleteClusterDialog />", () => {
         kubeConfigPath: "./temp-kube-config",
       });
 
-      DeleteClusterDialog.open({ cluster, config });
+      di.override(deleteClusterDialogStateInjectable, () => ({ cluster, config }));
 
       const { findByText } = render(<DeleteClusterDialog />);
 
@@ -195,7 +197,8 @@ describe("<DeleteClusterDialog />", () => {
         kubeConfigPath: "./temp-kube-config",
       });
 
-      DeleteClusterDialog.open({ cluster, config });
+      di.override(deleteClusterDialogStateInjectable, () => ({ cluster, config }));
+
 
       const { findByText, findByTestId } = render(<DeleteClusterDialog />);
       const link = await findByTestId("context-switch");
@@ -222,7 +225,7 @@ describe("<DeleteClusterDialog />", () => {
 
       const spy = jest.spyOn(cluster, "isInLocalKubeconfig").mockImplementation(() => true);
 
-      DeleteClusterDialog.open({ cluster, config });
+      di.override(deleteClusterDialogStateInjectable, () => ({ cluster, config }));
 
       const { getByTestId } = render(<DeleteClusterDialog />);
 
@@ -258,7 +261,7 @@ describe("<DeleteClusterDialog />", () => {
         kubeConfigPath: "./temp-kube-config",
       });
 
-      DeleteClusterDialog.open({ cluster, config });
+      di.override(deleteClusterDialogStateInjectable, () => ({ cluster, config }));
 
       const { getByTestId } = render(<DeleteClusterDialog />);
 

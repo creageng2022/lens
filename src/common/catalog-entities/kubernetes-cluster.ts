@@ -5,9 +5,8 @@
 
 import { CatalogEntity, CatalogEntityActionContext, CatalogEntityContextMenuContext, CatalogEntityMetadata, CatalogEntityStatus, CatalogCategory, CatalogCategorySpec } from "../catalog";
 import { clusterActivateHandler, clusterDisconnectHandler } from "../cluster-ipc";
-import { ClusterStore } from "../cluster-store/store";
 import { broadcastMessage, requestMain } from "../ipc";
-import { app } from "electron";
+import { app, ipcMain } from "electron";
 import type { CatalogEntitySpec } from "../catalog/catalog-entity";
 import { IpcRendererNavigationEvents } from "../../renderer/navigation/events";
 
@@ -66,7 +65,8 @@ export class KubernetesCluster extends CatalogEntity<KubernetesClusterMetadata, 
 
   async connect(): Promise<void> {
     if (app) {
-      await ClusterStore.getInstance().getById(this.metadata.uid)?.activate();
+      // TODO refactor
+      ipcMain.emit(clusterActivateHandler, this.metadata.uid, false);
     } else {
       await requestMain(clusterActivateHandler, this.metadata.uid, false);
     }
@@ -74,7 +74,7 @@ export class KubernetesCluster extends CatalogEntity<KubernetesClusterMetadata, 
 
   async disconnect(): Promise<void> {
     if (app) {
-      ClusterStore.getInstance().getById(this.metadata.uid)?.disconnect();
+      ipcMain.emit(clusterDisconnectHandler, this.metadata.uid, false);
     } else {
       await requestMain(clusterDisconnectHandler, this.metadata.uid, false);
     }

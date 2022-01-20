@@ -9,7 +9,6 @@ import { isMac, docsUrl, supportUrl, productName } from "../../common/vars";
 import logger from "../logger";
 import { broadcastMessage } from "../../common/ipc";
 import { preferencesURL, extensionsURL, addClusterURL, catalogURL, welcomeURL } from "../../common/routes";
-import { checkForUpdates, isAutoUpdateEnabled } from "../app-updater";
 import type { MenuRegistration } from "./menu-registration";
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { bind } from "../../common/utils";
@@ -18,18 +17,21 @@ import type { IComputedValue } from "mobx";
 import { showAbout } from "./show-about";
 import windowManagerInjectable from "../windows/manager.injectable";
 import exitAppInjectable from "../exit-app.injectable";
+import { isAutoUpdateEnabled } from "../app-updater/start-update-checking.injectable";
+import checkForUpdatesInjectable from "../app-updater/check-for-updates.injectable";
 
 interface BuildMenuDependencies {
   windowManager: WindowManager;
   electronMenuItems: IComputedValue<MenuRegistration[]>;
   exitApp: () => void;
+  checkForUpdates: () => Promise<void>;
 }
 
 interface MenuItemsOpts extends MenuItemConstructorOptions {
   submenu?: MenuItemConstructorOptions[];
 }
 
-function buildMenu({ windowManager, electronMenuItems, exitApp }: BuildMenuDependencies): Menu {
+function buildMenu({ windowManager, electronMenuItems, exitApp, checkForUpdates }: BuildMenuDependencies): Menu {
   function ignoreIf(check: boolean, menuItems: MenuItemConstructorOptions[]) {
     return check ? [] : menuItems;
   }
@@ -41,7 +43,7 @@ function buildMenu({ windowManager, electronMenuItems, exitApp }: BuildMenuDepen
 
   const autoUpdateDisabled = !isAutoUpdateEnabled();
 
-  logger.info(`[MENU]: autoUpdateDisabled=${autoUpdateDisabled}`);
+  logger.info(`[MENU]: auto updating is ${autoUpdateDisabled ? "disabled" : "enabled"}`);
 
   const macAppMenu: MenuItemsOpts = {
     label: app.getName(),
@@ -299,6 +301,7 @@ const buildMenuInjectable = getInjectable({
     electronMenuItems: di.inject(electronMenuItemsInjectable),
     windowManager: di.inject(windowManagerInjectable),
     exitApp: di.inject(exitAppInjectable),
+    checkForUpdates: di.inject(checkForUpdatesInjectable),
   }),
   lifecycle: lifecycleEnum.singleton,
 });

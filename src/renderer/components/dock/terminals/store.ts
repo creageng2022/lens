@@ -9,7 +9,7 @@ import type { Terminal } from "../terminal/terminal";
 import { TerminalApi, TerminalChannels } from "../../../api/terminal-api";
 import {
   DockStore,
-  DockTab,
+  DockTabData,
   DockTabCreate,
   TabId,
   TabKind,
@@ -17,7 +17,7 @@ import {
 import { WebSocketApiState } from "../../../api/websocket-api";
 import { Notifications } from "../../notifications";
 
-export interface ITerminalTab extends DockTab {
+export interface ITerminalTab extends DockTabData {
   node?: string; // activate node shell mode
 }
 

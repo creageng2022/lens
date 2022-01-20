@@ -6,20 +6,21 @@
 import React from "react";
 import type { LensProtocolRouterRenderer } from "../lens-protocol-router-renderer/lens-protocol-router-renderer";
 import { navigate } from "../../navigation/helpers";
-import { ClusterStore } from "../../../common/cluster-store/store";
 import { EXTENSION_NAME_MATCH, EXTENSION_PUBLISHER_MATCH, LensProtocolRouter } from "../../../common/protocol-handler";
 import { Notifications } from "../../components/notifications";
 import * as routes from "../../../common/routes";
 import type { ExtensionInfo } from "../../components/+extensions/attempt-install-by-info/attempt-install-by-info";
 import type { CatalogEntity } from "../../../common/catalog";
+import type { Cluster } from "../../../common/cluster/cluster";
 
 interface Dependencies {
   attemptInstallByInfo: (extensionInfo: ExtensionInfo) => Promise<void>;
   lensProtocolRouterRenderer: LensProtocolRouterRenderer;
   getEntityById: (id: string) => CatalogEntity | undefined;
+  getClusterById: (id: string) => Cluster | null;
 }
 
-export function addInternalProtocolRouteHandlers({ attemptInstallByInfo, lensProtocolRouterRenderer, getEntityById }: Dependencies) {
+export function addInternalProtocolRouteHandlers({ attemptInstallByInfo, lensProtocolRouterRenderer, getEntityById, getClusterById }: Dependencies) {
   return lensProtocolRouterRenderer
     .addInternalHandler("/preferences", ({ search: { highlight }}) => {
       navigate(routes.preferencesURL({ fragment: highlight }));
@@ -73,7 +74,7 @@ export function addInternalProtocolRouteHandlers({ attemptInstallByInfo, lensPro
     .addInternalHandler(
       "/cluster/:clusterId",
       ({ pathname: { clusterId }}) => {
-        const cluster = ClusterStore.getInstance().getById(clusterId);
+        const cluster = getClusterById(clusterId);
 
         if (cluster) {
           navigate(routes.clusterViewURL({ params: { clusterId }}));
@@ -89,7 +90,7 @@ export function addInternalProtocolRouteHandlers({ attemptInstallByInfo, lensPro
     .addInternalHandler(
       "/cluster/:clusterId/settings",
       ({ pathname: { clusterId }}) => {
-        const cluster = ClusterStore.getInstance().getById(clusterId);
+        const cluster = getClusterById(clusterId);
 
         if (cluster) {
           navigate(

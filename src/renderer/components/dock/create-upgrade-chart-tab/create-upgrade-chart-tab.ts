@@ -2,9 +2,9 @@
  * Copyright (c) OpenLens Authors. All rights reserved.
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
-import type { HelmRelease } from "../../../../common/k8s-api/endpoints/helm-releases.api";
+import type { HelmRelease } from "../../../../common/k8s-api/endpoints";
 import { DockStore, DockTabCreateSpecific, TabKind } from "../store";
-import type { UpgradeChartStore } from "../upgrade-chart-store/upgrade-chart.store";
+import type { UpgradeChartStore } from "../upgrade-chart/store";
 
 interface Dependencies {
   upgradeChartStore: UpgradeChartStore;

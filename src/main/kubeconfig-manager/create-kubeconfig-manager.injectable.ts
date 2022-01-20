@@ -6,15 +6,13 @@ import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import type { Cluster } from "../../common/cluster/cluster";
 import directoryForTempInjectable from "../../common/app-paths/directory-for-temp.injectable";
 import { KubeconfigManager } from "./kubeconfig-manager";
-
-export interface KubeConfigManagerInstantiationParameter {
-  cluster: Cluster;
-}
+import getProxyPortInjectable from "../lens-proxy/get-proxy-port.injectable";
 
 const createKubeconfigManagerInjectable = getInjectable({
   instantiate: (di) => {
     const dependencies = {
       directoryForTemp: di.inject(directoryForTempInjectable),
+      proxyPort: di.inject(getProxyPortInjectable),
     };
 
     return (cluster: Cluster) => new KubeconfigManager(dependencies, cluster);

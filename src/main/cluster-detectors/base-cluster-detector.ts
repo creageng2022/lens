@@ -16,8 +16,6 @@ export interface BaseClusterDetectorDependencies {
 }
 
 export abstract class BaseClusterDetector {
-  abstract key: string;
-
   constructor(public cluster: Cluster, protected readonly dependencies: BaseClusterDetectorDependencies) {
   }
 

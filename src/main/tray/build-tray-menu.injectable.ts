@@ -6,7 +6,6 @@ import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { bind } from "../../common/utils";
 import { Menu, MenuItemConstructorOptions } from "electron";
 import type { IComputedValue } from "mobx";
-import { checkForUpdates, isAutoUpdateEnabled } from "../app-updater";
 import type { WindowManager } from "../windows/manager";
 import { productName } from "../../common/vars";
 import { preferencesURL } from "../../common/routes";
@@ -17,12 +16,15 @@ import exitAppInjectable from "../exit-app.injectable";
 import trayLoggerInjectable from "./tray-logger.injectable";
 import trayMenuItemsInjectable from "./tray-menu-items.injectable";
 import windowManagerInjectable from "../windows/manager.injectable";
+import { isAutoUpdateEnabled } from "../app-updater/start-update-checking.injectable";
+import checkForUpdatesInjectable from "../app-updater/check-for-updates.injectable";
 
 interface Dependencies {
   windowManager: WindowManager;
   trayMenuItems: IComputedValue<TrayMenuRegistration[]>;
   exitApp: () => void;
   logger: LensLogger;
+  checkForUpdates: () => Promise<void>;
 }
 
 function getMenuItemConstructorOptions(trayItem: TrayMenuRegistration): MenuItemConstructorOptions {
@@ -39,7 +41,7 @@ function ignoreIf(check: boolean, menuItems: MenuItemConstructorOptions[]) {
   return check ? [] : menuItems;
 }
 
-function buildTrayMenu({ windowManager, trayMenuItems, exitApp, logger }: Dependencies) {
+function buildTrayMenu({ windowManager, trayMenuItems, exitApp, logger, checkForUpdates }: Dependencies) {
   const template: MenuItemConstructorOptions[] = [
     {
       label: `Open ${productName}`,
@@ -93,6 +95,7 @@ const buildTrayMenuInjectable = getInjectable({
     logger: di.inject(trayLoggerInjectable),
     trayMenuItems: di.inject(trayMenuItemsInjectable),
     windowManager: di.inject(windowManagerInjectable),
+    checkForUpdates: di.inject(checkForUpdatesInjectable),
   }),
   lifecycle: lifecycleEnum.singleton,
 });

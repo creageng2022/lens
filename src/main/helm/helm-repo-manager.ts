@@ -8,8 +8,6 @@ import { BaseEncodingOptions, readFile } from "fs-extra";
 import { promiseExecFile } from "../../common/utils/promise-exec";
 import { helmCli } from "./helm-cli";
 import { Singleton } from "../../common/utils/singleton";
-import { customRequestPromise } from "../../common/request";
-import orderBy from "lodash/orderBy";
 import logger from "../logger";
 import type { ExecFileOptions } from "child_process";
 
@@ -50,17 +48,6 @@ export class HelmRepoManager extends Singleton {
   protected repos: HelmRepo[];
   protected helmEnv: HelmEnv;
   protected initialized: boolean;
-
-  public static async loadAvailableRepos(): Promise<HelmRepo[]> {
-    const res = await customRequestPromise({
-      uri: "https://github.com/lensapp/artifact-hub-repositories/releases/download/latest/repositories.json",
-      json: true,
-      resolveWithFullResponse: true,
-      timeout: 10000,
-    });
-
-    return orderBy<HelmRepo>(res.body, repo => repo.name);
-  }
 
   private async init() {
     helmCli.setLogger(logger);

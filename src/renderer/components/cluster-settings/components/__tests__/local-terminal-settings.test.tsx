@@ -5,7 +5,7 @@
 
 import React from "react";
 import { render, waitFor } from "@testing-library/react";
-import { ClusterLocalTerminalSetting } from "../cluster-local-terminal-settings";
+import { ClusterLocalTerminalSetting } from "../local-terminal-settings";
 import userEvent from "@testing-library/user-event";
 import { stat } from "fs/promises";
 import { Notifications } from "../../../notifications";

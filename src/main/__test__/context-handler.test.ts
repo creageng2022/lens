@@ -3,7 +3,6 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 
-import { UserStore } from "../../common/user-store";
 import type { ContextHandler } from "../context-handler/context-handler";
 import { PrometheusProvider, PrometheusProviderRegistry, PrometheusService } from "../prometheus";
 import mockFs from "mock-fs";
@@ -89,7 +88,6 @@ describe("ContextHandler", () => {
 
   afterEach(() => {
     PrometheusProviderRegistry.resetInstance();
-    UserStore.resetInstance();
     mockFs.restore();
   });
 

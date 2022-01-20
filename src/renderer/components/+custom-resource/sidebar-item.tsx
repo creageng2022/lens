@@ -7,7 +7,6 @@ import { withInjectables } from "@ogre-tools/injectable-react";
 import type { IComputedValue } from "mobx";
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";
-import { crdStore } from "../../../../extensions/kube-object-event-status/node_modules/@k8slens/extensions/dist/src/renderer/components/+custom-resources/crd.store";
 import { crdURL, crdRoute } from "../../../common/routes";
 import { isAllowedResource } from "../../../extensions/renderer-api/k8s-api";
 import type { KubeWatchApi } from "../../kube-watch-api/kube-watch-api";
@@ -38,7 +37,7 @@ const NonInjectedCustomResourcesSidebarItem = observer(({ customResourceDefiniti
   const tabRoutes = routes.get();
 
   const renderCustomResources = () => {
-    if (crdStore.isLoading) {
+    if (customResourceDefinitionStore.isLoading) {
       return (
         <div className="flex justify-center">
           <Spinner/>
@@ -46,7 +45,7 @@ const NonInjectedCustomResourcesSidebarItem = observer(({ customResourceDefiniti
       );
     }
 
-    return Object.entries(crdStore.groups).map(([group, crds]) => {
+    return Object.entries(customResourceDefinitionStore.groups).map(([group, crds]) => {
       const id = `crd-group:${group}`;
       const crdGroupsPageUrl = crdURL({ query: { groups: group }});
 

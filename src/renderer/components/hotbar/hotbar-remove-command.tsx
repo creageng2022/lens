@@ -6,7 +6,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { Select } from "../select";
-import hotbarManagerInjectable from "../../../common/hotbar-store/store.injectable";
+import hotbarStoreInjectable from "../../../common/hotbar-store/store.injectable";
 import type { ConfirmDialogParams } from "../confirm-dialog";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import commandOverlayInjectable from "../command-palette/command-overlay.injectable";
@@ -72,7 +72,7 @@ const NonInjectedHotbarRemoveCommand = observer(({ closeCommandOverlay, hotbarMa
 export const HotbarRemoveCommand = withInjectables<Dependencies>(NonInjectedHotbarRemoveCommand, {
   getProps: (di, props) => ({
     closeCommandOverlay: di.inject(commandOverlayInjectable).close,
-    hotbarManager: di.inject(hotbarManagerInjectable),
+    hotbarManager: di.inject(hotbarStoreInjectable),
     openConfirmDialog: di.inject(openConfirmDialogInjectable),
     ...props,
   }),

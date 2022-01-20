@@ -3,11 +3,14 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 
-import { UserStore } from "../../common/user-store";
+import userStoreInjectable from "../../common/user-store/store.injectable";
+import { asLegacyGlobalObjectForExtensionApi } from "../as-legacy-globals-for-extension-api/as-legacy-global-object-for-extension-api";
+
+const userStore = asLegacyGlobalObjectForExtensionApi(userStoreInjectable);
 
 /**
  * Get the configured kubectl binaries path.
  */
 export function getKubectlPath(): string | undefined {
-  return UserStore.getInstance().kubectlBinariesPath;
+  return userStore.kubectlBinariesPath;
 }

@@ -22,13 +22,11 @@ import type { LensExtensionId } from "../extensions/lens-extension";
 import { installDeveloperTools } from "./developer-tools";
 import { disposer, getAppVersion, getAppVersionFromProxyServer } from "../common/utils";
 import { bindBroadcastHandlers, ipcMainOn } from "../common/ipc";
-import { startUpdateChecking } from "./app-updater";
 import { IpcRendererNavigationEvents } from "../renderer/navigation/events";
 import { pushCatalogToRenderer } from "./catalog-pusher";
 import { HelmRepoManager } from "./helm/helm-repo-manager";
 import configurePackages from "../common/configure-packages";
 import { PrometheusProviderRegistry } from "./prometheus";
-import { SentryInit } from "../common/sentry";
 import { ensureDir } from "fs-extra";
 import { ShellSession } from "./shell-session/shell-session";
 import { getDi } from "./getDi";
@@ -51,6 +49,8 @@ import initAppMenuInjectable from "./menu/init-app-menu.injectable";
 import windowManagerInjectable from "./windows/manager.injectable";
 import initTrayIconInjectable from "./tray/init-tray-icon.injectable";
 import getWeblinksSourceInjectable from "./catalog-sources/weblinks-source.injectable";
+import initializeSentryReportingInjectable from "../common/sentry";
+import startUpdateCheckingInjectable from "./app-updater/start-update-checking.injectable";
 
 app.setName(appName);
 
@@ -61,7 +61,7 @@ async function main() {
 
   await di.runSetups();
   injectSystemCAs();
-  SentryInit();
+  di.inject(initializeSentryReportingInjectable)();
 
   logger.info(`📟 Setting ${productName} as protocol client for lens://`);
 
@@ -220,7 +220,6 @@ async function main() {
       () => ShellSession.cleanup(),
     );
 
-
     ipcMainOn(IpcRendererNavigationEvents.LOADED, async () => {
       onCloseCleanup.push(pushCatalogToRenderer(catalogEntityRegistry));
 
@@ -232,7 +231,7 @@ async function main() {
 
       kubeConfigSyncManager.startSync();
 
-      startUpdateChecking();
+      di.inject(startUpdateCheckingInjectable)();
       lensProtocolRouterMain.rendererLoaded = true;
     });
 

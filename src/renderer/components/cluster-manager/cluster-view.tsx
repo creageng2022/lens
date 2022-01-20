@@ -10,7 +10,6 @@ import { observer } from "mobx-react";
 import type { RouteComponentProps } from "react-router";
 import { ClusterStatus } from "./cluster-status";
 import type { Cluster } from "../../../common/cluster/cluster";
-import { ClusterStore } from "../../../common/cluster-store/store";
 import type { ClusterFrameHandler } from "./cluster-frame-handler";
 import { requestMain } from "../../../common/ipc";
 import { clusterActivateHandler } from "../../../common/cluster-ipc";
@@ -21,6 +20,7 @@ import { withInjectables } from "@ogre-tools/injectable-react";
 import catalogEntityRegistryInjectable from "../../catalog/entity-registry.injectable";
 import clusterFrameHandlerInjectable from "./cluster-frame-handler.injectable";
 import { disposer } from "../../utils";
+import getClusterByIdInjectable from "../../../common/cluster-store/get-cluster-by-id.injectable";
 
 export interface ClusterViewProps extends RouteComponentProps<ClusterViewRouteParams> {
 }
@@ -72,7 +72,7 @@ const NonInjectedClusterView = observer(({ catalogEntityRegistry, getClusterById
 export const ClusterView = withInjectables<Dependencies, ClusterViewProps>(NonInjectedClusterView, {
   getProps: (di, props) => ({
     catalogEntityRegistry: di.inject(catalogEntityRegistryInjectable),
-    getClusterById: ClusterStore.getInstance().getById,
+    getClusterById: di.inject(getClusterByIdInjectable),
     clusterFrameHandler: di.inject(clusterFrameHandlerInjectable),
     ...props,
   }),

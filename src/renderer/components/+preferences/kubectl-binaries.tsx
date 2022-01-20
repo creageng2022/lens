@@ -6,7 +6,7 @@
 import React, { useState } from "react";
 import { Input, InputValidators } from "../input";
 import { SubTitle } from "../layout/sub-title";
-import { UserStore } from "../../../common/user-store";
+import type { UserStore } from "../../../common/user-store";
 import { bundledKubectlPath } from "../../../main/kubectl/kubectl";
 import { SelectOption, Select } from "../select";
 import { Switch } from "../switch";
@@ -14,13 +14,15 @@ import { packageMirrors } from "../../../common/user-store/preferences-helpers";
 import directoryForBinariesInjectable
   from "../../../common/app-paths/directory-for-binaries.injectable";
 import { withInjectables } from "@ogre-tools/injectable-react";
+import { observer } from "mobx-react";
+import userStoreInjectable from "../../../common/user-store/store.injectable";
 
 interface Dependencies {
-  defaultPathForKubectlBinaries: string
+  defaultPathForKubectlBinaries: string;
+  userStore: UserStore;
 }
 
-const NonInjectedKubectlBinaries: React.FC<Dependencies> = (({ defaultPathForKubectlBinaries }) => {
-  const userStore = UserStore.getInstance();
+const NonInjectedKubectlBinaries = observer(({ defaultPathForKubectlBinaries, userStore }: Dependencies) => {
   const [downloadPath, setDownloadPath] = useState(userStore.downloadBinariesPath || "");
   const [binariesPath, setBinariesPath] = useState(userStore.kubectlBinariesPath || "");
   const pathValidator = downloadPath ? InputValidators.isPath : undefined;
@@ -94,5 +96,6 @@ const NonInjectedKubectlBinaries: React.FC<Dependencies> = (({ defaultPathForKub
 export const KubectlBinaries = withInjectables<Dependencies>(NonInjectedKubectlBinaries, {
   getProps: (di) => ({
     defaultPathForKubectlBinaries: di.inject(directoryForBinariesInjectable),
+    userStore: di.inject(userStoreInjectable),
   }),
 });

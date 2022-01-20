@@ -4,14 +4,14 @@
  */
 
 import { autoUpdater, UpdateInfo } from "electron-updater";
-import logger from "./logger";
-import { isLinux, isMac, isPublishConfigured, isTestEnv } from "../common/vars";
-import { delay } from "../common/utils";
-import { areArgsUpdateAvailableToBackchannel, AutoUpdateChecking, AutoUpdateLogPrefix, AutoUpdateNoUpdateAvailable, broadcastMessage, onceCorrect, UpdateAvailableChannel, UpdateAvailableToBackchannel } from "../common/ipc";
+import logger from "../logger";
+import { isLinux, isMac, isPublishConfigured, isTestEnv } from "../../common/vars";
+import { delay, bind } from "../../common/utils";
+import { areArgsUpdateAvailableToBackchannel, AutoUpdateLogPrefix, AutoUpdateNoUpdateAvailable, broadcastMessage, onceCorrect, UpdateAvailableChannel, UpdateAvailableToBackchannel } from "../../common/ipc";
 import { once } from "lodash";
 import { ipcMain, autoUpdater as electronAutoUpdater } from "electron";
-import { nextUpdateChannel } from "./utils/update-channel";
-import { UserStore } from "../common/user-store";
+import { nextUpdateChannel } from "../utils/update-channel";
+import type { UserStore } from "../../common/user-store/store";
 
 let installVersion: null | string = null;
 
@@ -58,16 +58,19 @@ autoUpdater.logger = {
   debug: message => logger.debug(`[AUTO-UPDATE]: electron-updater:`, message),
 };
 
+interface Dependencies {
+  userStore: UserStore;
+  checkForUpdates: () => Promise<void>;
+}
+
 /**
  * starts the automatic update checking
  * @param interval milliseconds between interval to check on, defaults to 24h
  */
-export const startUpdateChecking = once(function (interval = 1000 * 60 * 60 * 24): void {
+const startUpdateChecking = once(function ({ userStore, checkForUpdates }: Dependencies, interval = 1000 * 60 * 60 * 24): void {
   if (!isAutoUpdateEnabled() || isTestEnv) {
     return;
   }
-
-  const userStore = UserStore.getInstance();
 
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = false;
@@ -139,17 +142,16 @@ export const startUpdateChecking = once(function (interval = 1000 * 60 * 60 * 24
   helper();
 });
 
-export async function checkForUpdates(): Promise<void> {
-  const userStore = UserStore.getInstance();
+import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import checkForUpdatesInjectable from "./check-for-updates.injectable";
+import userStoreInjectable from "../../common/user-store/store.injectable";
 
-  try {
-    logger.info(`📡 Checking for app updates`);
+const startUpdateCheckingInjectable = getInjectable({
+  instantiate: (di) => bind(startUpdateChecking, null, {
+    checkForUpdates: di.inject(checkForUpdatesInjectable),
+    userStore: di.inject(userStoreInjectable),
+  }),
+  lifecycle: lifecycleEnum.singleton,
+});
 
-    autoUpdater.channel = userStore.updateChannel;
-    autoUpdater.allowDowngrade = userStore.isAllowedToDowngrade;
-    broadcastMessage(AutoUpdateChecking);
-    await autoUpdater.checkForUpdates();
-  } catch (error) {
-    logger.error(`${AutoUpdateLogPrefix}: failed with an error`, error);
-  }
-}
+export default startUpdateCheckingInjectable;

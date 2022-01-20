@@ -10,6 +10,7 @@ import addInternalProtocolRouteHandlersInjectable from "../../../protocol-handle
 import lensProtocolRouterRendererInjectable from "../../../protocol-handler/lens-protocol-router-renderer/lens-protocol-router-renderer.injectable";
 import catalogEntityRegistryInjectable from "../../../catalog/entity-registry.injectable";
 import { bind } from "../../../utils";
+import getClusterByIdInjectable from "../../../../common/cluster-store/get-cluster-by-id.injectable";
 
 const initRootFrameInjectable = getInjectable({
   instantiate: (di) => bind(initRootFrame, null, {
@@ -18,6 +19,7 @@ const initRootFrameInjectable = getInjectable({
     bindProtocolAddRouteHandlers: di.inject(addInternalProtocolRouteHandlersInjectable),
     lensProtocolRouterRenderer: di.inject(lensProtocolRouterRendererInjectable),
     catalogEntityRegistry: di.inject(catalogEntityRegistryInjectable),
+    getClusterById: di.inject(getClusterByIdInjectable),
   }),
 
   lifecycle: lifecycleEnum.singleton,

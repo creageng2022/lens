@@ -9,7 +9,7 @@ import { broadcastMessage } from "../../../common/ipc";
 import { ProtocolHandlerExtension, ProtocolHandlerInternal } from "../../../common/protocol-handler";
 import { delay, noop } from "../../../common/utils";
 import { LensExtension } from "../../../extensions/main-api";
-import { ExtensionsStore } from "../../../extensions/extensions-store/extensions-store";
+import type { ExtensionsStore } from "../../../extensions/extensions-store/extensions-store";
 import type { LensProtocolRouterMain } from "../router";
 import mockFs from "mock-fs";
 import { getDiForUnitTesting } from "../../getDiForUnitTesting";
@@ -49,10 +49,6 @@ describe("protocol router tests", () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-
-    // TODO: Remove Singleton from BaseStore to achieve independent unit testing
-    ExtensionsStore.resetInstance();
-
     mockFs.restore();
   });
 

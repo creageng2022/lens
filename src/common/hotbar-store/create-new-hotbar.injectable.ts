@@ -3,10 +3,10 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import hotbarManagerInjectable from "./store.injectable";
+import hotbarStoreInjectable from "./store.injectable";
 
 const createNewHotbarInjectable = getInjectable({
-  instantiate: (di) => di.inject(hotbarManagerInjectable).add,
+  instantiate: (di) => di.inject(hotbarStoreInjectable).add,
   lifecycle: lifecycleEnum.singleton,
 });
 

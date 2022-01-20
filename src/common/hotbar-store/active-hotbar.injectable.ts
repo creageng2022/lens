@@ -4,11 +4,11 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { computed } from "mobx";
-import { HotbarStore } from "./store";
+import hotbarStoreInjectable from "./store.injectable";
 
 const activeHotbarInjectable = getInjectable({
-  instantiate: () => {
-    const hotbarStore = HotbarStore.getInstance();
+  instantiate: (di) => {
+    const hotbarStore = di.inject(hotbarStoreInjectable);
 
     return computed(() => hotbarStore.getActive());
   },

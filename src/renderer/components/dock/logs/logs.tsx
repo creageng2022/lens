@@ -39,7 +39,7 @@ const NonInjectedLogs = observer(({ className, tab, logTabStore, logSearchStore,
 
   const load = async () => {
     setIsLoading(true);
-    await logsStore.load(tab.id);
+    await logsStore.load();
     setIsLoading(false);
   };
   const reload = async () => {
@@ -82,7 +82,6 @@ const NonInjectedLogs = observer(({ className, tab, logTabStore, logSearchStore,
               tabId={tab.id}
               tabData={data}
               save={newData => logTabStore.setData(tab.id, { ...data, ...newData })}
-              reload={reload}
             />
             <LogSearch
               onSearch={toOverlay}
@@ -110,7 +109,6 @@ const NonInjectedLogs = observer(({ className, tab, logTabStore, logSearchStore,
         logs={logs}
         tabData={data}
         save={newData => logTabStore.setData(tab.id, { ...data, ...newData })}
-        reload={reload}
       />
     </div>
   );

@@ -4,9 +4,9 @@
  */
 
 import styles from "./monaco-editor.module.scss";
-import React from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { observer } from "mobx-react";
-import { action, computed, IComputedValue, makeObservable, observable, reaction } from "mobx";
+import { action, IComputedValue, reaction } from "mobx";
 import { editor, Uri } from "monaco-editor";
 import type { MonacoTheme } from "./monaco-themes";
 import { MonacoValidator, monacoValidators } from "./monaco-validators";
@@ -17,6 +17,7 @@ import type { Theme } from "../../themes/store";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import activeThemeInjectable from "../../themes/active-theme.injectable";
 import userStoreInjectable from "../../../common/user-store/store.injectable";
+import type { LensLogger } from "../../../common/logger";
 
 export type MonacoEditorId = string;
 
@@ -39,6 +40,7 @@ export interface MonacoEditorProps {
 interface Dependencies {
   readonly activeTheme: IComputedValue<Theme>;
   readonly userStore: UserStore;
+  readonly logger: LensLogger;
 }
 
 function createUri(id: MonacoEditorId): Uri {
@@ -47,98 +49,93 @@ function createUri(id: MonacoEditorId): Uri {
 
 const viewStates = new WeakMap<Uri, editor.ICodeEditorViewState>();
 
-@observer
-class MonacoEditorNonInjected extends React.Component<MonacoEditorProps & Dependencies> {
-  static defaultProps = {
-    language: "yaml",
-  } as object;
+export interface MonacoEditorRef {
+  focus: () => void;
+}
 
-  public staticId = `editor-id#${Math.round(1e7 * Math.random())}`;
-  public dispose = disposer();
+const NonInjectedMonacoEditor = observer(forwardRef<MonacoEditorRef, Dependencies & MonacoEditorProps>(({
+  language = "yaml",
+  activeTheme,
+  userStore,
+  id: propsId,
+  className,
+  style,
+  autoFocus,
+  readOnly,
+  theme = activeTheme.get().monacoTheme,
+  options: propsOptions,
+  value: defaultValue,
+  onChange,
+  onError,
+  onDidLayoutChange,
+  onDidContentSizeChange,
+  onModelChange: propsOnModelChange,
+  logger,
+}, ref) => {
+  const [staticId] = useState(`editor-id#${Math.round(1e7 * Math.random())}`);
+  const containerElem = useRef<HTMLDivElement>();
+  const [editorRef, setEditorRef] = useState<editor.IStandaloneCodeEditor | undefined>();
+  const [unmounting, setUnmounting] = useState(false);
+  const [dispose] = useState(() => disposer());
 
-  // TODO: investigate how to replace with "common/logger"
-  //  currently leads for stucking UI forever & infinite loop.
-  //  e.g. happens on tab change/create, maybe some other cases too.
-  logger = console;
+  const id = propsId ?? staticId;
+  const uri = createUri(id);
+  const model = editor.getModel(uri) ?? editor.createModel(defaultValue, language, uri);
+  const options = merge(
+    {},
+    userStore.editorConfiguration,
+    propsOptions,
+  );
+  const logMetadata = { editorId: id, model };
 
-  @observable.ref containerElem: HTMLElement;
-  @observable.ref editor: editor.IStandaloneCodeEditor;
-  @observable dimensions: { width?: number, height?: number } = {};
-  @observable unmounting = false;
+  const validate = action((value = getValue()) => {
+    const validators: MonacoValidator[] = [
+      monacoValidators[language], // parsing syntax check
+    ].filter(Boolean);
 
-  constructor(props: MonacoEditorProps & Dependencies) {
-    super(props);
-    makeObservable(this);
-  }
-
-  get theme() {
-    return this.props.theme ?? this.props.activeTheme.get().monacoTheme;
-  }
-
-  @computed get id() {
-    return this.props.id ?? this.staticId;
-  }
-
-  @computed get model(): editor.ITextModel {
-    const uri = createUri(this.id);
-    const model = editor.getModel(uri);
-
-    if (model) {
-      return model; // already exists
+    for (const validate of validators) {
+      try {
+        validate(value);
+      } catch (error) {
+        onError?.(error); // emit error outside
+      }
     }
+  });
 
-    const { language, value } = this.props;
-
-    return editor.createModel(value, language, uri);
-  }
-
-  @computed get options(): editor.IStandaloneEditorConstructionOptions {
-    return merge({},
-      this.props.userStore.editorConfiguration,
-      this.props.options,
-    );
-  }
-
-  @computed get logMetadata() {
-    return {
-      editorId: this.id,
-      model: this.model,
-    };
-  }
+  const [validateLazy] = useState(() => debounce(validate, 250));
 
   /**
    * Monitor editor's dom container element box-size and sync with monaco's dimensions
-   * @private
    */
-  private bindResizeObserver() {
+  const bindResizeObserver = () => {
     const resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
 
-        this.setDimensions(width, height);
+        setDimensions(width, height);
       }
     });
 
-    const containerElem = this.editor.getContainerDomNode();
+    const containerElem = editorRef.getContainerDomNode();
 
     resizeObserver.observe(containerElem);
 
     return () => resizeObserver.unobserve(containerElem);
-  }
+  };
 
-  onModelChange = (model: editor.ITextModel, oldModel?: editor.ITextModel) => {
-    this.logger?.info("[MONACO]: model change", { model, oldModel }, this.logMetadata);
+  const onModelChange = (model: editor.ITextModel, oldModel?: editor.ITextModel) => {
+    logger?.info("[MONACO]: model change", { model, oldModel }, logMetadata);
 
     if (oldModel) {
-      this.saveViewState(oldModel);
+      saveViewState(oldModel);
     }
 
-    this.editor.setModel(model);
-    this.restoreViewState(model);
-    this.editor.layout();
-    this.editor.focus(); // keep focus in editor, e.g. when clicking between dock-tabs
-    this.props.onModelChange?.(model, oldModel);
-    this.validateLazy();
+    editorRef.setModel(model);
+    restoreViewState(model);
+    editorRef.layout();
+    editorRef.focus(); // keep focus in editor, e.g. when clicking between dock-tabs
+    propsOnModelChange?.(model, oldModel);
+    validateLazy();
   };
 
   /**
@@ -146,153 +143,135 @@ class MonacoEditorNonInjected extends React.Component<MonacoEditorProps & Depend
    * This will allow restore cursor position, selected text, etc.
    * @param {editor.ITextModel} model
    */
-  private saveViewState(model: editor.ITextModel) {
-    viewStates.set(model.uri, this.editor.saveViewState());
-  }
+  const saveViewState = (model: editor.ITextModel) => {
+    viewStates.set(model.uri, editorRef.saveViewState());
+  };
 
-  private restoreViewState(model: editor.ITextModel) {
+  const restoreViewState = (model: editor.ITextModel) => {
     const viewState = viewStates.get(model.uri);
 
     if (viewState) {
-      this.editor.restoreViewState(viewState);
+      editorRef.restoreViewState(viewState);
     }
-  }
+  };
 
-  componentDidMount() {
-    try {
-      this.createEditor();
-      this.logger?.info(`[MONACO]: editor did mount`, this.logMetadata);
-    } catch (error) {
-      this.logger?.error(`[MONACO]: mounting failed: ${error}`, this.logMetadata);
-    }
-  }
-
-  componentWillUnmount() {
-    this.unmounting = true;
-    this.saveViewState(this.model);
-    this.destroy();
-  }
-
-  private createEditor() {
-    if (!this.containerElem || this.editor || this.unmounting) {
+  const createEditor = () => {
+    if (!containerElem.current || editorRef || unmounting) {
       return;
     }
-    const { language, theme, readOnly, value: defaultValue } = this.props;
 
-    this.editor = editor.create(this.containerElem, {
-      model: this.model,
+    const _editor = editor.create(containerElem.current, {
+      model,
       detectIndentation: false, // allow `option.tabSize` to use custom number of spaces for [Tab]
       value: defaultValue,
       language,
       theme,
       readOnly,
-      ...this.options,
+      ...options,
     });
 
-    this.logger?.info(`[MONACO]: editor created for language=${language}, theme=${theme}`, this.logMetadata);
-    this.validateLazy(); // validate initial value
-    this.restoreViewState(this.model); // restore previous state if any
+    setEditorRef(_editor);
 
-    if (this.props.autoFocus) {
-      this.editor.focus();
+    logger?.info(`[MONACO]: editor created for language=${language}, theme=${theme}`, logMetadata);
+    validateLazy(); // validate initial value
+    restoreViewState(model); // restore previous state if any
+
+    if (autoFocus) {
+      editorRef.focus();
     }
 
-    const onDidLayoutChangeDisposer = this.editor.onDidLayoutChange(layoutInfo => {
-      this.props.onDidLayoutChange?.(layoutInfo);
+    const onDidLayoutChangeDisposer = editorRef.onDidLayoutChange(layoutInfo => {
+      onDidLayoutChange?.(layoutInfo);
     });
 
-    const onValueChangeDisposer = this.editor.onDidChangeModelContent(event => {
-      const value = this.editor.getValue();
+    const onValueChangeDisposer = editorRef.onDidChangeModelContent(event => {
+      const value = editorRef.getValue();
 
-      this.props.onChange?.(value, event);
-      this.validateLazy(value);
+      onChange?.(value, event);
+      validateLazy(value);
     });
 
-    const onContentSizeChangeDisposer = this.editor.onDidContentSizeChange((params) => {
-      this.props.onDidContentSizeChange?.(params);
+    const onContentSizeChangeDisposer = editorRef.onDidContentSizeChange((params) => {
+      onDidContentSizeChange?.(params);
     });
 
-    this.dispose.push(
-      reaction(() => this.model, this.onModelChange),
-      reaction(() => this.props.theme, editor.setTheme),
-      reaction(() => this.props.value, value => this.setValue(value)),
-      reaction(() => this.options, opts => this.editor.updateOptions(opts)),
+    dispose.push(
+      reaction(() => model, onModelChange),
+      reaction(() => theme, editor.setTheme),
+      reaction(() => defaultValue, value => setValue(value)),
+      reaction(() => options, opts => editorRef.updateOptions(opts)),
 
       () => onDidLayoutChangeDisposer.dispose(),
       () => onValueChangeDisposer.dispose(),
       () => onContentSizeChangeDisposer.dispose(),
-      this.bindResizeObserver(),
+      bindResizeObserver(),
     );
-  }
-
-  destroy(): void {
-    if (!this.editor) return;
-
-    this.dispose();
-    this.editor.dispose();
-    this.editor = null;
-  }
-
-  @action
-  setDimensions(width: number, height: number) {
-    this.dimensions.width = width;
-    this.dimensions.height = height;
-    this.editor?.layout({ width, height });
-  }
-
-  setValue(value = ""): void {
-    if (value == this.getValue()) return;
-
-    this.editor.setValue(value);
-    this.validate(value);
-  }
-
-  getValue(opts?: { preserveBOM: boolean; lineEnding: string; }): string {
-    return this.editor?.getValue(opts) ?? "";
-  }
-
-  focus() {
-    this.editor?.focus();
-  }
-
-  @action
-  validate = (value = this.getValue()) => {
-    const validators: MonacoValidator[] = [
-      monacoValidators[this.props.language], // parsing syntax check
-    ].filter(Boolean);
-
-    for (const validate of validators) {
-      try {
-        validate(value);
-      } catch (error) {
-        this.props.onError?.(error); // emit error outside
-      }
-    }
   };
 
-  // avoid excessive validations during typing
-  validateLazy = debounce(this.validate, 250);
+  const destroy = () => {
+    if (!editorRef) return;
 
-  bindRef = (elem: HTMLElement) => this.containerElem = elem;
+    dispose();
+    editorRef.dispose();
+    setEditorRef(undefined);
+  };
 
-  render() {
-    const { className, style } = this.props;
+  const setDimensions = (width: number, height: number) => {
+    editorRef?.layout({ width, height });
+  };
 
-    return (
-      <div
-        data-test-component="monaco-editor"
-        className={cssNames(styles.MonacoEditor, className)}
-        style={style}
-        ref={this.bindRef}
-      />
-    );
-  }
-}
+  const setValue = (value = "") => {
+    if (value == getValue()) return;
 
-export const MonacoEditor = withInjectables<Dependencies, MonacoEditorProps>(MonacoEditorNonInjected, {
+    editorRef.setValue(value);
+    validate(value);
+  };
+
+  const getValue = (opts?: { preserveBOM: boolean; lineEnding: string; }) => {
+    return editorRef?.getValue(opts) ?? "";
+  };
+
+  const focus = () => {
+    editorRef?.focus();
+  };
+
+  useImperativeHandle(ref, () => ({
+    focus,
+  }));
+
+  useEffect(() => {
+    try {
+      createEditor();
+      logger?.info(`[MONACO]: editor did mount`, logMetadata);
+    } catch (error) {
+      logger?.error(`[MONACO]: mounting failed: ${error}`, logMetadata);
+    }
+
+    return () => {
+      setUnmounting(true);
+      saveViewState(model);
+      destroy();
+    };
+  }, []);
+
+  return (
+    <div
+      data-test-component="monaco-editor"
+      className={cssNames(styles.MonacoEditor, className)}
+      style={style}
+      ref={containerElem}
+    />
+  );
+}));
+
+export const MonacoEditor = withInjectables<Dependencies, MonacoEditorProps>(NonInjectedMonacoEditor, {
   getProps: (di, props) => ({
     activeTheme: di.inject(activeThemeInjectable),
     userStore: di.inject(userStoreInjectable),
+    logger: {
+      ...console,
+      silly: console.debug,
+    },
     ...props,
   }),
 });

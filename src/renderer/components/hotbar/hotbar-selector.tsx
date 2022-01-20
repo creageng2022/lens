@@ -7,7 +7,7 @@ import styles from "./hotbar-selector.module.scss";
 import React, { useRef, useState } from "react";
 import { Icon } from "../icon";
 import { Badge } from "../badge";
-import hotbarManagerInjectable from "../../../common/hotbar-store/store.injectable";
+import hotbarStoreInjectable from "../../../common/hotbar-store/store.injectable";
 import { HotbarSwitchCommand } from "./hotbar-switch-command";
 import { Tooltip, TooltipPosition } from "../tooltip";
 import { observer } from "mobx-react";
@@ -86,7 +86,7 @@ const NonInjectedHotbarSelector = observer(({ hotbar, hotbarManager, openCommand
 
 export const HotbarSelector = withInjectables<Dependencies, HotbarSelectorProps>(NonInjectedHotbarSelector, {
   getProps: (di, props) => ({
-    hotbarManager: di.inject(hotbarManagerInjectable),
+    hotbarManager: di.inject(hotbarStoreInjectable),
     openCommandOverlay: di.inject(commandOverlayInjectable).open,
     ...props,
   }),

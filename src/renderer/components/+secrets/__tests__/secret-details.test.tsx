@@ -12,6 +12,7 @@ import { getDiForUnitTesting } from "../../../getDiForUnitTesting";
 import getStatusItemsForKubeObjectInjectable from "../../kube-object-status-icon/status-items-for-object.injectable";
 import localeTimezoneInjectable from "../../locale-date/locale-timezone.injectable";
 import { type DiRender, renderFor } from "../../test-utils/renderFor";
+import { computed } from "mobx";
 
 describe("SecretDetails tests", () => {
   let render: DiRender;
@@ -21,7 +22,7 @@ describe("SecretDetails tests", () => {
     di = getDiForUnitTesting();
     render = renderFor(di);
     di.override(lookupApiLinkInjectable, () => () => "");
-    di.override(localeTimezoneInjectable, () => "Europe/Helsinki");
+    di.override(localeTimezoneInjectable, () => computed(() => "Europe/Helsinki"));
     di.override(getStatusItemsForKubeObjectInjectable, () => () => []);
   });
 

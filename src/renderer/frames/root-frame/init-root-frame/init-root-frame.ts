@@ -10,6 +10,7 @@ import { unmountComponentAtNode } from "react-dom";
 import type { ExtensionLoading } from "../../../../extensions/extension-loader";
 import type { CatalogEntityRegistry } from "../../../catalog/entity-registry";
 import { injectSystemCAs } from "../../../../common/system-ca";
+import type { Cluster } from "../../../../common/cluster/cluster";
 
 interface Dependencies {
   loadExtensions: () => Promise<ExtensionLoading[]>;
@@ -21,12 +22,13 @@ interface Dependencies {
   bindProtocolAddRouteHandlers: () => void;
   lensProtocolRouterRenderer: { init: () => void };
   catalogEntityRegistry: CatalogEntityRegistry;
+  getClusterById: (clusterId: string) => Cluster | null;
 }
 
 const logPrefix = "[ROOT-FRAME]:";
 
 export async function initRootFrame(
-  { loadExtensions, bindProtocolAddRouteHandlers, lensProtocolRouterRenderer, ipcRenderer, catalogEntityRegistry }: Dependencies,
+  { loadExtensions, bindProtocolAddRouteHandlers, lensProtocolRouterRenderer, ipcRenderer, catalogEntityRegistry, getClusterById }: Dependencies,
   rootElem: HTMLElement,
 ) {
   injectSystemCAs();
@@ -58,7 +60,7 @@ export async function initRootFrame(
 
   window.addEventListener("online", () => broadcastMessage("network:online"));
 
-  registerIpcListeners();
+  registerIpcListeners({ getClusterById });
 
   window.addEventListener("beforeunload", () => {
     logger.info(`${logPrefix} Unload app`);

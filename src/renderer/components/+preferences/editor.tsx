@@ -4,12 +4,14 @@
  */
 import { observer } from "mobx-react";
 import React from "react";
-import { UserStore } from "../../../common/user-store";
+import type { UserStore } from "../../../common/user-store";
 import { Switch } from "../switch";
 import { Select } from "../select";
 import { SubTitle } from "../layout/sub-title";
 import { SubHeader } from "../layout/sub-header";
 import { Input, InputValidators } from "../input";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import userStoreInjectable from "../../../common/user-store/store.injectable";
 
 enum EditorLineNumbersStyles {
   on = "On",
@@ -18,8 +20,14 @@ enum EditorLineNumbersStyles {
   interval = "Interval",
 }
 
-export const Editor = observer(() => {
-  const editorConfiguration = UserStore.getInstance().editorConfiguration;
+export interface EditorProps {}
+
+interface Dependencies {
+  userStore: UserStore;
+}
+
+const NonInjectedEditor = observer(({ userStore }: Dependencies & EditorProps) => {
+  const { editorConfiguration } = userStore;
 
   return (
     <section id="editor">
@@ -71,5 +79,12 @@ export const Editor = observer(() => {
       </section>
     </section>
   );
+});
+
+export const Editor = withInjectables<Dependencies, EditorProps>(NonInjectedEditor, {
+  getProps: (di, props) => ({
+    userStore: di.inject(userStoreInjectable),
+    ...props,
+  }),
 });
 

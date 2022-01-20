@@ -5,11 +5,23 @@
 
 import path from "path";
 import { helmCli } from "../../helm/helm-cli";
-import { UserStore } from "../../../common/user-store";
-import { ShellSession } from "../shell-session";
+import { ShellSession, ShellSessionDependencies } from "../shell-session";
+import type { IComputedValue } from "mobx";
+import type { Kubectl } from "../../kubectl/kubectl";
+import type { Cluster } from "../../../common/cluster/cluster";
+import type WebSocket from "ws";
+
+export interface LocalShellSessionDependencies extends ShellSessionDependencies {
+  readonly kubectlBinariesPath: IComputedValue<string>;
+  readonly downloadKubectlBinaries: IComputedValue<boolean>;
+}
 
 export class LocalShellSession extends ShellSession {
   ShellType = "shell";
+
+  constructor(kubectl: Kubectl, websocket: WebSocket, cluster: Cluster, terminalId: string, protected readonly dependencies: LocalShellSessionDependencies) {
+    super(kubectl, websocket, cluster, terminalId, dependencies);
+  }
 
   protected getPathEntries(): string[] {
     return [helmCli.getBinaryDir()];
@@ -29,8 +41,10 @@ export class LocalShellSession extends ShellSession {
 
   protected async getShellArgs(shell: string): Promise<string[]> {
     const helmpath = helmCli.getBinaryDir();
-    const pathFromPreferences = UserStore.getInstance().kubectlBinariesPath || this.kubectl.getBundledPath();
-    const kubectlPathDir = UserStore.getInstance().downloadKubectlBinaries ? await this.kubectlBinDirP : path.dirname(pathFromPreferences);
+    const pathFromPreferences = this.dependencies.kubectlBinariesPath.get() || this.kubectl.getBundledPath();
+    const kubectlPathDir = this.dependencies.downloadKubectlBinaries.get()
+      ? await this.kubectlBinDirP
+      : path.dirname(pathFromPreferences);
 
     switch(path.basename(shell)) {
       case "powershell.exe":

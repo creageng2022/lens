@@ -20,7 +20,6 @@ import { DefaultProps } from "./mui-base-theme";
 import configurePackages from "../common/configure-packages";
 import * as initializers from "./initializers";
 import logger from "../common/logger";
-import { SentryInit } from "../common/sentry";
 import { registerCustomThemes } from "./components/monaco-editor";
 import { getDi } from "./getDi";
 import { DiContextProvider } from "@ogre-tools/injectable-react";
@@ -32,10 +31,7 @@ import userStoreInjectable from "../common/user-store/store.injectable";
 import initRootFrameInjectable from "./frames/root-frame/init-root-frame/init-root-frame.injectable";
 import initClusterFrameInjectable from "./frames/cluster-frame/init-cluster-frame/init-cluster-frame.injectable";
 import isAllowedResourceInjectable from "./utils/allowed-resource.injectable";
-
-if (process.isMainFrame) {
-  SentryInit();
-}
+import initializeSentryReportingInjectable from "../common/sentry";
 
 configurePackages(); // global packages
 registerCustomThemes(); // monaco editor themes
@@ -60,6 +56,10 @@ async function bootstrap() {
 
   // TODO: Remove temporal dependencies to make timing of initialization not important
   di.inject(userStoreInjectable);
+
+  if (process.isMainFrame) {
+    di.inject(initializeSentryReportingInjectable);
+  }
 
   await attachChromeDebugger();
   rootElem.classList.toggle("is-mac", isMac);

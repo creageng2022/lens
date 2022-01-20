@@ -8,17 +8,18 @@ import { observer } from "mobx-react";
 import moment from "moment-timezone";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import localeTimezoneInjectable from "./locale-timezone.injectable";
+import type { IComputedValue } from "mobx";
 
 export interface LocaleDateProps {
   date: string
 }
 
 interface Dependencies {
-  localeTimezone: string;
+  localeTimezone: IComputedValue<string>;
 }
 
 const NonInjectedLocaleDate = observer(({ localeTimezone, date }: Dependencies & LocaleDateProps) => (
-  <>{moment.tz(date, localeTimezone).format()}</>
+  <>{moment.tz(date, localeTimezone.get()).format()}</>
 ));
 
 export const LocaleDate = withInjectables<Dependencies, LocaleDateProps>(NonInjectedLocaleDate, {

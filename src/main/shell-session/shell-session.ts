@@ -12,13 +12,13 @@ import { clearKubeconfigEnvVars } from "../utils/clear-kube-env-vars";
 import path from "path";
 import os from "os";
 import { isMac, isWindows } from "../../common/vars";
-import { UserStore } from "../../common/user-store";
 import * as pty from "node-pty";
 import { appEventBus } from "../../common/app-event-bus/event-bus";
 import logger from "../logger";
 import { TerminalChannels, TerminalMessage } from "../../renderer/api/terminal-api";
 import { deserialize, serialize } from "v8";
 import { stat } from "fs/promises";
+import type { IComputedValue } from "mobx";
 
 export class ShellOpenError extends Error {
   constructor(message: string, public cause: Error) {
@@ -104,6 +104,10 @@ export enum WebSocketCloseEvent {
   TlsHandshake = 1015,
 }
 
+export interface ShellSessionDependencies {
+  readonly resolvedShell: IComputedValue<string>;
+}
+
 export abstract class ShellSession {
   abstract ShellType: string;
 
@@ -155,7 +159,7 @@ export abstract class ShellSession {
     return { shellProcess, resume };
   }
 
-  constructor(protected kubectl: Kubectl, protected websocket: WebSocket, protected cluster: Cluster, terminalId: string) {
+  constructor(protected kubectl: Kubectl, protected websocket: WebSocket, protected cluster: Cluster, terminalId: string, protected readonly dependencies: ShellSessionDependencies) {
     this.kubeconfigPathP = this.cluster.getProxyKubeconfigPath();
     this.kubectlBinDirP = this.kubectl.binDir();
     this.terminalId = `${cluster.id}:${terminalId}`;
@@ -313,7 +317,7 @@ export abstract class ShellSession {
   protected async getShellEnv() {
     const env = clearKubeconfigEnvVars(JSON.parse(JSON.stringify(await shellEnv())));
     const pathStr = [...this.getPathEntries(), await this.kubectlBinDirP, process.env.PATH].join(path.delimiter);
-    const shell = UserStore.getInstance().resolvedShell;
+    const shell = this.dependencies.resolvedShell.get();
 
     delete env.DEBUG; // don't pass DEBUG into shells
 

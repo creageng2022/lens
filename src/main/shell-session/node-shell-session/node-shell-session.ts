@@ -8,7 +8,7 @@ import { v4 as uuid } from "uuid";
 import * as k8s from "@kubernetes/client-node";
 import type { KubeConfig } from "@kubernetes/client-node";
 import type { Cluster } from "../../../common/cluster/cluster";
-import { ShellOpenError, ShellSession } from "../shell-session";
+import { ShellOpenError, ShellSession, ShellSessionDependencies } from "../shell-session";
 import { get } from "lodash";
 import { Node, NodeApi } from "../../../common/k8s-api/endpoints";
 import type { KubeJsonApi } from "../../../common/k8s-api/kube-json-api";
@@ -16,7 +16,7 @@ import logger from "../../logger";
 import { TerminalChannels } from "../../../renderer/api/terminal-api";
 import type { Kubectl } from "../../kubectl/kubectl";
 
-export interface NodeShellSessionDependencies {
+export interface NodeShellSessionDependencies extends ShellSessionDependencies {
   createKubeJsonApiForCluster: (clusterId: string) => KubeJsonApi;
 }
 
@@ -29,7 +29,7 @@ export class NodeShellSession extends ShellSession {
   protected readonly cwd: string | undefined = undefined;
 
   constructor(protected nodeName: string, kubectl: Kubectl, socket: WebSocket, cluster: Cluster, terminalId: string, protected readonly dependencies: NodeShellSessionDependencies) {
-    super(kubectl, socket, cluster, terminalId);
+    super(kubectl, socket, cluster, terminalId, dependencies);
   }
 
   public async open() {
