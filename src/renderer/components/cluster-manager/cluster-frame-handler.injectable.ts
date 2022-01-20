@@ -3,10 +3,13 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
+import getClusterByIdInjectable from "../../../common/cluster-store/get-cluster-by-id.injectable";
 import { ClusterFrameHandler } from "./cluster-frame-handler";
 
 const clusterFrameHandlerInjectable = getInjectable({
-  instantiate: () => new ClusterFrameHandler(),
+  instantiate: (di) => new ClusterFrameHandler({
+    getClusterById: di.inject(getClusterByIdInjectable),
+  }),
   lifecycle: lifecycleEnum.singleton,
 });
 

@@ -4,8 +4,8 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { editResourceTab } from "./edit-resource-tab";
-import editResourceStoreInjectable from "../edit-resource-store/edit-resource-store.injectable";
-import dockStoreInjectable from "../dock-store/dock-store.injectable";
+import editResourceStoreInjectable from "../edit-resource/store.injectable";
+import dockStoreInjectable from "../store.injectable";
 
 const editResourceTabInjectable = getInjectable({
   instantiate: (di) => editResourceTab({

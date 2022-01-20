@@ -22,7 +22,7 @@ import * as routes from "../../../common/routes";
 import { DeleteClusterDialog } from "../delete-cluster-dialog";
 import { reaction } from "mobx";
 import { navigation } from "../../navigation";
-import setEntityOnRouteMatchInjectable from "../../api/general-active-sync.injectable";
+import setEntityOnRouteMatchInjectable from "../../catalog/set-entity-on-route-match.injectable";
 import { catalogURL, getPreviousTabUrl } from "../../../common/routes";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import { TopBar } from "../layout/top-bar/top-bar";

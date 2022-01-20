@@ -13,7 +13,7 @@ import {
   DockTabCreate,
   TabId,
   TabKind,
-} from "../dock-store/dock.store";
+} from "../store";
 import { WebSocketApiState } from "../../../api/websocket-api";
 import { Notifications } from "../../notifications";
 

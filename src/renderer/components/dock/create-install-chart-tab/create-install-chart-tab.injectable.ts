@@ -5,7 +5,7 @@
 import { createInstallChartTab } from "./create-install-chart-tab";
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import installChartStoreInjectable from "../install-chart-store/install-chart-store.injectable";
-import dockStoreInjectable from "../dock-store/dock-store.injectable";
+import dockStoreInjectable from "../store.injectable";
 
 const createInstallChartTabInjectable = getInjectable({
   instantiate: (di) => createInstallChartTab({

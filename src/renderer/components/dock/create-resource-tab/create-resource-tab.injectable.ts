@@ -4,7 +4,7 @@
  */
 import { createResourceTab } from "./create-resource-tab";
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import dockStoreInjectable from "../dock-store/dock-store.injectable";
+import dockStoreInjectable from "../store.injectable";
 
 const createResourceTabInjectable = getInjectable({
   instantiate: (di) => createResourceTab({

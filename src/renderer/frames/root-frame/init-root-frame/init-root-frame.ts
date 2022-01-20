@@ -9,6 +9,7 @@ import logger from "../../../../common/logger";
 import { unmountComponentAtNode } from "react-dom";
 import type { ExtensionLoading } from "../../../../extensions/extension-loader";
 import type { CatalogEntityRegistry } from "../../../catalog/entity-registry";
+import { injectSystemCAs } from "../../../../common/system-ca";
 
 interface Dependencies {
   loadExtensions: () => Promise<ExtensionLoading[]>;
@@ -28,6 +29,7 @@ export async function initRootFrame(
   { loadExtensions, bindProtocolAddRouteHandlers, lensProtocolRouterRenderer, ipcRenderer, catalogEntityRegistry }: Dependencies,
   rootElem: HTMLElement,
 ) {
+  injectSystemCAs();
   catalogEntityRegistry.init();
 
   try {

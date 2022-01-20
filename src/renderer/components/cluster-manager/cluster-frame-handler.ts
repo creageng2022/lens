@@ -6,25 +6,31 @@
 import { action, IReactionDisposer, observable, when } from "mobx";
 import logger from "../../../main/logger";
 import { clusterVisibilityHandler } from "../../../common/cluster-ipc";
-import { ClusterStore } from "../../../common/cluster-store/store";
 import type { ClusterId } from "../../../common/cluster-types";
 import { getClusterFrameUrl } from "../../utils";
 import { ipcRenderer } from "electron";
+import type { Cluster } from "../../../common/cluster/cluster";
 
 export interface LensView {
   isLoaded: boolean;
   frame: HTMLIFrameElement;
 }
 
+export interface ClusterFrameHandlerDependencies {
+  getClusterById: (id: string) => Cluster | null;
+}
+
 export class ClusterFrameHandler {
   private views = observable.map<string, LensView>();
+
+  constructor(protected readonly dependencies: ClusterFrameHandlerDependencies) {}
 
   public hasLoadedView(clusterId: string): boolean {
     return Boolean(this.views.get(clusterId)?.isLoaded);
   }
 
   public initView = action((clusterId: ClusterId) => {
-    const cluster = ClusterStore.getInstance().getById(clusterId);
+    const cluster = this.dependencies.getClusterById(clusterId);
 
     if (!cluster || this.views.has(clusterId)) {
       return;
@@ -58,7 +64,7 @@ export class ClusterFrameHandler {
       () => {
         when(
           () => {
-            const cluster = ClusterStore.getInstance().getById(clusterId);
+            const cluster = this.dependencies.getClusterById(clusterId);
 
             return !cluster || (cluster.disconnected && this.views.get(clusterId)?.isLoaded);
           },
@@ -86,7 +92,7 @@ export class ClusterFrameHandler {
       view.style.display = "none";
     }
 
-    const cluster = ClusterStore.getInstance().getById(clusterId);
+    const cluster = this.dependencies.getClusterById(clusterId);
 
     if (cluster) {
       this.prevVisibleClusterChange = when(

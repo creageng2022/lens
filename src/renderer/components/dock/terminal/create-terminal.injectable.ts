@@ -4,9 +4,9 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { Terminal } from "./terminal";
-import type { TabId } from "../dock-store/dock.store";
+import type { TabId } from "../store";
 import type { TerminalApi } from "../../../api/terminal-api";
-import dockStoreInjectable from "../dock-store/dock-store.injectable";
+import dockStoreInjectable from "../store.injectable";
 
 const createTerminalInjectable = getInjectable({
   instantiate: (di) => {

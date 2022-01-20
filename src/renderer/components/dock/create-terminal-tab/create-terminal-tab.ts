@@ -6,7 +6,7 @@ import {
   DockStore,
   DockTabCreateSpecific,
   TabKind,
-} from "../dock-store/dock.store";
+} from "../store";
 
 interface Dependencies {
   dockStore: DockStore;

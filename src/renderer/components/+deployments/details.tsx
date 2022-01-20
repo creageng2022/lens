@@ -26,12 +26,13 @@ import { DeploymentReplicaSets } from "./details-replica-sets";
 import { ClusterMetricsResourceType } from "../../../common/cluster-types";
 import { cssNames, disposer } from "../../utils";
 import logger from "../../../common/logger";
-import { kubeWatchApi } from "../../../common/k8s-api/kube-watch-api";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import podStoreInjectable from "../+pods/store.injectable";
 import deploymentStoreInjectable from "./store.injectable";
 import replicaSetStoreInjectable from "../+replica-sets/store.injectable";
 import isMetricHiddenInjectable from "../../utils/is-metrics-hidden.injectable";
+import type { KubeWatchApi } from "../../kube-watch-api/kube-watch-api";
+import kubeWatchApiInjectable from "../../kube-watch-api/kube-watch-api.injectable";
 
 export interface DeploymentDetailsProps extends KubeObjectDetailsProps<Deployment> {
 }
@@ -41,9 +42,10 @@ interface Dependencies {
   deploymentStore: DeploymentStore;
   replicaSetStore: ReplicaSetStore;
   isMetricHidden: boolean;
+  kubeWatchApi: KubeWatchApi;
 }
 
-const NonInjectedDeploymentDetails = observer(({ isMetricHidden, podStore, deploymentStore, replicaSetStore, className, object: deployment }: Dependencies & DeploymentDetailsProps) => {
+const NonInjectedDeploymentDetails = observer(({ kubeWatchApi, isMetricHidden, podStore, deploymentStore, replicaSetStore, className, object: deployment }: Dependencies & DeploymentDetailsProps) => {
   const [metrics, setMetrics] = useState<IPodMetrics | null>(null);
 
   useEffect(() => disposer(
@@ -151,6 +153,7 @@ export const DeploymentDetails = withInjectables<Dependencies, DeploymentDetails
     isMetricHidden: di.inject(isMetricHiddenInjectable, {
       metricType: ClusterMetricsResourceType.Deployment,
     }),
+    kubeWatchApi: di.inject(kubeWatchApiInjectable),
     ...props,
   }),
 });

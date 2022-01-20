@@ -4,8 +4,8 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { createUpgradeChartTab } from "./create-upgrade-chart-tab";
-import upgradeChartStoreInjectable from "../upgrade-chart-store/upgrade-chart-store.injectable";
-import dockStoreInjectable from "../dock-store/dock-store.injectable";
+import upgradeChartStoreInjectable from "../upgrade-chart/store.injectable";
+import dockStoreInjectable from "../store.injectable";
 
 const createUpgradeChartTabInjectable = getInjectable({
   instantiate: (di) => createUpgradeChartTab({

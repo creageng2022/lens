@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import type { KubeObject } from "../../../../common/k8s-api/kube-object";
-import { DockStore, DockTabCreateSpecific, TabKind } from "../dock-store/dock.store";
+import { DockStore, DockTabCreateSpecific, TabKind } from "../store";
 import type { EditResourceStore } from "../edit-resource-store/edit-resource.store";
 
 interface Dependencies {

@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import type { HelmRelease } from "../../../../common/k8s-api/endpoints/helm-releases.api";
-import { DockStore, DockTabCreateSpecific, TabKind } from "../dock-store/dock.store";
+import { DockStore, DockTabCreateSpecific, TabKind } from "../store";
 import type { UpgradeChartStore } from "../upgrade-chart-store/upgrade-chart.store";
 
 interface Dependencies {

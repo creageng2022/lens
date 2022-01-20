@@ -4,11 +4,15 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { computed } from "mobx";
-import { ClusterStore } from "../../common/cluster-store/cluster-store";
+import getClusterByIdInjectable from "../../common/cluster-store/get-cluster-by-id.injectable";
 import { getHostedClusterId } from "../utils";
 
 const currentClusterInjectable = getInjectable({
-  instantiate: () => computed(() => ClusterStore.getInstance().getById(getHostedClusterId())),
+  instantiate: (di) => {
+    const getClusterById = di.inject(getClusterByIdInjectable);
+
+    return computed(() => getClusterById(getHostedClusterId()));
+  },
   lifecycle: lifecycleEnum.singleton,
 });
 

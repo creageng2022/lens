@@ -4,7 +4,7 @@
  */
 import { createTerminalTab } from "./create-terminal-tab";
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import dockStoreInjectable from "../dock-store/dock-store.injectable";
+import dockStoreInjectable from "../store.injectable";
 
 const createTerminalTabInjectable = getInjectable({
   instantiate: (di) => createTerminalTab({

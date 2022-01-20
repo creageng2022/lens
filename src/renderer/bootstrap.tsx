@@ -31,6 +31,7 @@ import clusterStoreInjectable from "../common/cluster-store/store.injectable";
 import userStoreInjectable from "../common/user-store/store.injectable";
 import initRootFrameInjectable from "./frames/root-frame/init-root-frame/init-root-frame.injectable";
 import initClusterFrameInjectable from "./frames/cluster-frame/init-cluster-frame/init-cluster-frame.injectable";
+import isAllowedResourceInjectable from "./utils/allowed-resource.injectable";
 
 if (process.isMainFrame) {
   SentryInit();
@@ -73,7 +74,7 @@ async function bootstrap() {
   initializers.initKubeObjectMenuRegistry();
 
   logger.info(`${logPrefix} initializing WorkloadsOverviewDetailRegistry`);
-  initializers.initWorkloadsOverviewDetailRegistry();
+  initializers.initWorkloadsOverviewDetailRegistry(di.inject(isAllowedResourceInjectable));
 
   const extensionLoader = di.inject(extensionLoaderInjectable);
 

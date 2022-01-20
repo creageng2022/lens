@@ -4,22 +4,18 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { InstallChartStore } from "./install-chart.store";
-import dockStoreInjectable from "../dock-store/dock-store.injectable";
-import createDockTabStoreInjectable from "../dock-tab-store/create-dock-tab-store.injectable";
-import type { IReleaseUpdateDetails } from "../../../../common/k8s-api/endpoints/helm-releases.api";
-import createStorageInjectable from "../../../utils/create-storage/create-storage.injectable";
+import dockStoreInjectable from "../store.injectable";
+import installChartStoreStorageInjectable from "./storage.injectable";
+import installChartVersionStoreInjectable from "./version-store.injectable";
+import installChartDetailsStoreInjectable from "./details-store.injectable";
 
 const installChartStoreInjectable = getInjectable({
-  instantiate: (di) => {
-    const createDockTabStore = di.inject(createDockTabStoreInjectable);
-
-    return new InstallChartStore({
-      dockStore: di.inject(dockStoreInjectable),
-      createStorage: di.inject(createStorageInjectable),
-      versionsStore: createDockTabStore<string[]>(),
-      detailsStore: createDockTabStore<IReleaseUpdateDetails>(),
-    });
-  },
+  instantiate: (di) => new InstallChartStore({
+    dockStore: di.inject(dockStoreInjectable),
+    storage: di.inject(installChartStoreStorageInjectable),
+    versionsStore: di.inject(installChartVersionStoreInjectable),
+    detailsStore: di.inject(installChartDetailsStoreInjectable),
+  }),
   lifecycle: lifecycleEnum.singleton,
 });
 

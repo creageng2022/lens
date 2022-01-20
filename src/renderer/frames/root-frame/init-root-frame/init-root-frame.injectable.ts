@@ -8,7 +8,7 @@ import extensionLoaderInjectable from "../../../../extensions/extension-loader/e
 import ipcRendererInjectable from "../../../app-paths/get-value-from-registered-channel/ipc-renderer/ipc-renderer.injectable";
 import addInternalProtocolRouteHandlersInjectable from "../../../protocol-handler/bind-protocol-add-route-handlers/bind-protocol-add-route-handlers.injectable";
 import lensProtocolRouterRendererInjectable from "../../../protocol-handler/lens-protocol-router-renderer/lens-protocol-router-renderer.injectable";
-import catalogEntityRegistryInjectable from "../../../api/catalog-entity-registry/catalog-entity-registry.injectable";
+import catalogEntityRegistryInjectable from "../../../catalog/entity-registry.injectable";
 import { bind } from "../../../utils";
 
 const initRootFrameInjectable = getInjectable({
