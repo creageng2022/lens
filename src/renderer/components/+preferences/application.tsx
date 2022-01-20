@@ -7,8 +7,8 @@ import React from "react";
 import { observer } from "mobx-react";
 import { SubTitle } from "../layout/sub-title";
 import { Select, SelectOption } from "../select";
-import { ThemeStore } from "../../theme-store/theme.store";
-import { UserStore } from "../../../common/user-store";
+import type { ThemeStore } from "../../themes/store";
+import type { UserStore } from "../../../common/user-store";
 import { Input } from "../input";
 import { isWindows } from "../../../common/vars";
 import { Switch } from "../switch";
@@ -20,6 +20,8 @@ import { ExtensionSettings } from "./extension-settings";
 import type { RegisteredAppPreference } from "./app-preferences/app-preference-registration";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import appPreferencesInjectable from "./app-preferences/app-preferences.injectable";
+import themeStoreInjectable from "../../themes/store.injectable";
+import userStoreInjectable from "../../../common/user-store/store.injectable";
 
 const timezoneOptions: SelectOption<string>[] = moment.tz.names().map(zone => ({
   label: zone,
@@ -30,12 +32,15 @@ const updateChannelOptions: SelectOption<string>[] = Array.from(
   ([value, { label }]) => ({ value, label }),
 );
 
+export interface ApplicationProps {}
+
 interface Dependencies {
-  appPreferenceItems: IComputedValue<RegisteredAppPreference[]>
+  appPreferenceItems: IComputedValue<RegisteredAppPreference[]>;
+  userStore: UserStore;
+  themeStore: ThemeStore;
 }
 
-const NonInjectedApplication: React.FC<Dependencies> = ({ appPreferenceItems }) => {
-  const userStore = UserStore.getInstance();
+const NonInjectedApplication = observer(({ appPreferenceItems, themeStore, userStore }: Dependencies & ApplicationProps) => {
   const defaultShell = process.env.SHELL
     || process.env.PTYSHELL
     || (
@@ -47,7 +52,6 @@ const NonInjectedApplication: React.FC<Dependencies> = ({ appPreferenceItems }) 
   const [customUrl, setCustomUrl] = React.useState(userStore.extensionRegistryUrl.customUrl || "");
   const [shell, setShell] = React.useState(userStore.shell || "");
   const extensionSettings = appPreferenceItems.get().filter((preference) => preference.showInPreferencesTab === "application");
-  const themeStore = ThemeStore.getInstance();
 
   return (
     <section id="application">
@@ -169,14 +173,12 @@ const NonInjectedApplication: React.FC<Dependencies> = ({ appPreferenceItems }) 
       </section>
     </section>
   );
-};
+});
 
-export const Application = withInjectables<Dependencies>(
-  observer(NonInjectedApplication),
-
-  {
-    getProps: (di) => ({
-      appPreferenceItems: di.inject(appPreferencesInjectable),
-    }),
-  },
-);
+export const Application = withInjectables<Dependencies, ApplicationProps>(NonInjectedApplication, {
+  getProps: (di) => ({
+    appPreferenceItems: di.inject(appPreferencesInjectable),
+    themeStore: di.inject(themeStoreInjectable),
+    userStore: di.inject(userStoreInjectable),
+  }),
+});

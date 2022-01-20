@@ -5,9 +5,9 @@
 
 import fs from "fs-extra";
 import path from "path";
-import defaultBaseLensTheme from "../src/renderer/themes/lens-dark.json";
+import defaultBaseLensTheme from "../src/renderer/internal-themes/lens-dark.json";
 
-const outputCssFile = path.resolve("src/renderer/themes/theme-vars.css");
+const outputCssFile = path.resolve("src/renderer/internal-themes/theme-vars.css");
 
 const banner = `/*
     Generated Lens theme CSS-variables, don't edit manually.

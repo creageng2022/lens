@@ -11,7 +11,7 @@ import { ConfigMapStore } from "../../renderer/components/+config-maps/store";
 import { PodDisruptionBudgetStore } from "../../renderer/components/+pod-disruption-budgets/store";
 import { ResourceQuotaStore } from "../../renderer/components/+resource-quotas/store";
 import { SecretStore } from "../../renderer/components/+secrets/store";
-import { CustomResourceDefinitionStore } from "../../renderer/components/+custom-resource-definitions/store";
+import { CustomResourceDefinitionStore } from "../../renderer/components/+custom-resource/store";
 import { EventStore } from "../../renderer/components/+events/store";
 import { NamespaceStore } from "../../renderer/components/+namespaces/store";
 import { EndpointStore } from "../../renderer/components/+endpoints/store";

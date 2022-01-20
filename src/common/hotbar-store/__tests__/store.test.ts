@@ -3,84 +3,48 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 
+import type { DependencyInjectionContainer } from "@ogre-tools/injectable";
 import mockFs from "mock-fs";
-import { AppPaths } from "../../app-paths";
-import { ClusterStore } from "../../cluster-store";
-import { HotbarStore } from "../store";
-
-jest.mock("../../main/catalog/catalog-entity-registry", () => ({
-  catalogEntityRegistry: {
-    items: [
-      {
-        metadata: {
-          uid: "1dfa26e2ebab15780a3547e9c7fa785c",
-          name: "mycluster",
-          source: "local",
-        },
-      },
-      {
-        metadata: {
-          uid: "55b42c3c7ba3b04193416cda405269a5",
-          name: "my_shiny_cluster",
-          source: "remote",
-        },
-      },
-      {
-        metadata: {
-          uid: "catalog-entity",
-          name: "Catalog",
-          source: "app",
-        },
-      },
-    ],
-  },
-}));
-
-jest.mock("electron", () => ({
-  app: {
-    getVersion: () => "99.99.99",
-    getName: () => "lens",
-    setName: jest.fn(),
-    setPath: jest.fn(),
-    getPath: () => "tmp",
-    getLocale: () => "en",
-    setLoginItemSettings: jest.fn(),
-  },
-  ipcMain: {
-    on: jest.fn(),
-    handle: jest.fn(),
-  },
-}));
-
-AppPaths.init();
+import { getDisForUnitTesting } from "../../../test-utils/get-dis-for-unit-testing";
+import directoryForUserDataInjectable from "../../app-paths/directory-for-user-data.injectable";
+import type { HotbarStore } from "../store";
 
 describe("HotbarStore", () => {
+  let hotbarStore: HotbarStore;
+  let mainDi: DependencyInjectionContainer;
+
+  beforeEach(async () => {
+    const dis = getDisForUnitTesting({ doGeneralOverrides: true });
+
+    mockFs();
+
+    mainDi = dis.mainDi;
+
+    mainDi.override(directoryForUserDataInjectable, () => "some-directory-for-user-data");
+
+    await dis.runSetups();
+  });
+
   beforeEach(() => {
     mockFs({
-      "tmp": {
+      "some-directory-for-user-data": {
         "lens-hotbar-store.json": JSON.stringify({}),
       },
     });
-    ClusterStore.createInstance();
-    HotbarStore.createInstance();
   });
 
   afterEach(() => {
-    ClusterStore.resetInstance();
-    HotbarStore.resetInstance();
     mockFs.restore();
   });
 
   describe("load", () => {
     it("loads one hotbar by default", () => {
-      expect(HotbarStore.getInstance().hotbars.length).toEqual(1);
+      expect(hotbarStore.hotbars.length).toEqual(1);
     });
   });
 
   describe("add", () => {
     it("adds a hotbar", () => {
-      const hotbarStore = HotbarStore.getInstance();
-
       hotbarStore.add({ name: "hottest" });
       expect(hotbarStore.hotbars.length).toEqual(2);
     });
@@ -88,23 +52,18 @@ describe("HotbarStore", () => {
 
   describe("hotbar items", () => {
     it("initially creates 12 empty cells", () => {
-      const hotbarStore = HotbarStore.getInstance();
-
       expect(hotbarStore.getActive().items.length).toEqual(12);
     });
 
     it("initially adds catalog entity as first item", () => {
-      const hotbarStore = HotbarStore.getInstance();
-
       expect(hotbarStore.getActive().items[0].entity.name).toEqual("Catalog");
     });
   });
 
   describe("pre beta-5 migrations", () => {
     beforeEach(() => {
-      HotbarStore.resetInstance();
       const mockOpts = {
-        "tmp": {
+        "some-directory-for-user-data": {
           "lens-hotbar-store.json": JSON.stringify({
             __internal__: {
               migrations: {
@@ -166,8 +125,6 @@ describe("HotbarStore", () => {
       };
 
       mockFs(mockOpts);
-
-      HotbarStore.createInstance();
     });
 
     afterEach(() => {
@@ -175,19 +132,19 @@ describe("HotbarStore", () => {
     });
 
     it("allows to retrieve a hotbar", () => {
-      const hotbar = HotbarStore.getInstance().getById("3caac17f-aec2-4723-9694-ad204465d935");
+      const hotbar = hotbarStore.getById("3caac17f-aec2-4723-9694-ad204465d935");
 
       expect(hotbar.id).toBe("3caac17f-aec2-4723-9694-ad204465d935");
     });
 
     it("clears cells without entity", () => {
-      const items = HotbarStore.getInstance().hotbars[0].items;
+      const items = hotbarStore.hotbars[0].items;
 
       expect(items[2]).toBeNull();
     });
 
     it("adds extra data to cells with according entity", () => {
-      const items = HotbarStore.getInstance().hotbars[0].items;
+      const items = hotbarStore.hotbars[0].items;
 
       expect(items[0]).toEqual({
         entity: {

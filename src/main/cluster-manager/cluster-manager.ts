@@ -13,7 +13,7 @@ import { getClusterIdFromHost } from "../../common/utils";
 import type { CatalogEntityRegistry } from "../catalog";
 import { KubernetesCluster, KubernetesClusterPrometheusMetrics, LensKubernetesClusterStatus } from "../../common/catalog-entities/kubernetes-cluster";
 import { ipcMainOn } from "../../common/ipc";
-import type { ClusterStore } from "../../common/cluster-store/cluster-store";
+import type { ClusterStore } from "../../common/cluster-store/store";
 import type { ClusterId } from "../../common/cluster-types";
 
 const logPrefix = "[CLUSTER-MANAGER]:";

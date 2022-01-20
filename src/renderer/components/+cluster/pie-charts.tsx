@@ -12,10 +12,13 @@ import { Icon } from "../icon";
 import { ChartData, PieChart } from "../chart";
 import { ClusterNoMetrics } from "./no-metrics";
 import { bytesToUnits, cssNames } from "../../utils";
-import { ThemeStore } from "../../theme-store/theme.store";
+import type { Theme } from "../../themes/store";
 import { getMetricLastPoints } from "../../../common/k8s-api/endpoints/metrics.api";
 import type { IClusterMetrics, Node } from "../../../common/k8s-api/endpoints";
 import { MetricNodeRole } from "./overview.state";
+import type { IComputedValue } from "mobx";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import activeThemeInjectable from "../../themes/active-theme.injectable";
 
 function createLabels(rawLabelData: [string, number | undefined][]): string[] {
   return rawLabelData.map(([key, value]) => `${key}: ${value?.toFixed(2) || "N/A"}`);
@@ -28,7 +31,17 @@ export interface ClusterPieChartsProps {
   workerNodes: Node[];
 }
 
-export const ClusterPieCharts = observer(({ metrics, masterNodes, workerNodes, metricsNodeRole }: ClusterPieChartsProps) => {
+interface Dependencies {
+  activeTheme: IComputedValue<Theme>;
+}
+
+const NonInjectedClusterPieCharts = observer(({
+  activeTheme,
+  masterNodes,
+  metrics,
+  metricsNodeRole,
+  workerNodes,
+}: Dependencies & ClusterPieChartsProps) => {
   const renderLimitWarning = () => {
     return (
       <div className="node-warning flex gaps align-center">
@@ -44,7 +57,7 @@ export const ClusterPieCharts = observer(({ metrics, masterNodes, workerNodes, m
     const { podUsage, podAllocatableCapacity, podCapacity } = data;
     const cpuLimitsOverload = cpuLimits > cpuAllocatableCapacity;
     const memoryLimitsOverload = memoryLimits > memoryAllocatableCapacity;
-    const defaultColor = ThemeStore.getInstance().activeTheme.colors.pieChartDefaultColor;
+    const defaultColor = activeTheme.get().colors.pieChartDefaultColor;
 
     if (!memoryCapacity || !cpuCapacity || !podCapacity || !memoryAllocatableCapacity || !cpuAllocatableCapacity || !podAllocatableCapacity) return null;
     const cpuData: ChartData = {
@@ -238,4 +251,11 @@ export const ClusterPieCharts = observer(({ metrics, masterNodes, workerNodes, m
       {renderContent()}
     </div>
   );
+});
+
+export const ClusterPieCharts = withInjectables<Dependencies, ClusterPieChartsProps>(NonInjectedClusterPieCharts, {
+  getProps: (di, props) => ({
+    activeTheme: di.inject(activeThemeInjectable),
+    ...props,
+  }),
 });

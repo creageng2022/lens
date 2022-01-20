@@ -22,10 +22,11 @@ import { ClusterMetricsResourceType } from "../../../common/cluster-types";
 import { NodeDetailsResources } from "./resource-details";
 import { DrawerTitle } from "../drawer/drawer-title";
 import logger from "../../../common/logger";
-import { kubeWatchApi } from "../../../common/k8s-api/kube-watch-api";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import podStoreInjectable from "../+pods/store.injectable";
 import isMetricHiddenInjectable from "../../utils/is-metrics-hidden.injectable";
+import type { KubeWatchApi } from "../../kube-watch-api/kube-watch-api";
+import kubeWatchApiInjectable from "../../kube-watch-api/kube-watch-api.injectable";
 
 export interface NodeDetailsProps extends KubeObjectDetailsProps<Node> {
 }
@@ -33,9 +34,10 @@ export interface NodeDetailsProps extends KubeObjectDetailsProps<Node> {
 interface Dependencies {
   podStore: PodStore;
   isMetricHidden: boolean;
+  kubeWatchApi: KubeWatchApi;
 }
 
-const NonInjectedNodeDetails = observer(({ isMetricHidden, podStore, object: node }: Dependencies & NodeDetailsProps) => {
+const NonInjectedNodeDetails = observer(({ kubeWatchApi, isMetricHidden, podStore, object: node }: Dependencies & NodeDetailsProps) => {
   const [metrics, setMetrics] = useState<IClusterMetrics | null>(null);
 
   useEffect(() => setMetrics(null), [node]);
@@ -166,6 +168,7 @@ export const NodeDetails = withInjectables<Dependencies, NodeDetailsProps>(NonIn
     isMetricHidden: di.inject(isMetricHiddenInjectable, {
       metricType: ClusterMetricsResourceType.Node,
     }),
+    kubeWatchApi: di.inject(kubeWatchApiInjectable),
     ...props,
   }),
 });

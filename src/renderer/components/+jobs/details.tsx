@@ -27,14 +27,14 @@ import { ResourceMetrics } from "../resource-metrics";
 import { getDetailsUrl } from "../kube-detail-params";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import logger from "../../../common/logger";
-import type { KubeWatchApi } from "../../../common/k8s-api/kube-watch-api";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
 import { disposer } from "../../utils";
-import kubeWatchApiInjectable from "../../../common/k8s-api/kube-watch-api.injectable";
 import podStoreInjectable from "../+pods/store.injectable";
 import jobStoreInjectable from "./store.injectable";
 import isMetricHiddenInjectable from "../../utils/is-metrics-hidden.injectable";
+import type { KubeWatchApi } from "../../kube-watch-api/kube-watch-api";
+import kubeWatchApiInjectable from "../../kube-watch-api/kube-watch-api.injectable";
 
 export interface JobDetailsProps extends KubeObjectDetailsProps<Job> {
 }

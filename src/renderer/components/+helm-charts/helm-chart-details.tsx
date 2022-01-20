@@ -18,12 +18,7 @@ import { Select, SelectOption } from "../select";
 import { Badge } from "../badge";
 import { Tooltip, withStyles } from "@material-ui/core";
 import { withInjectables } from "@ogre-tools/injectable-react";
-<<<<<<< HEAD
-import createInstallChartTabInjectable
-  from "../dock/create-install-chart-tab/create-install-chart-tab.injectable";
-=======
 import newInstallChartTabInjectable from "../dock/install-chart/create-tab.injectable";
->>>>>>> d574d3d018... Replace a bunch of items with dependency injection
 
 export interface HelmChartDetailsProps {
   chart: HelmChart | null | undefined;
@@ -37,54 +32,8 @@ const LargeTooltip = withStyles({
 })(Tooltip);
 
 interface Dependencies {
-<<<<<<< HEAD
-  createInstallChartTab: (helmChart: HelmChart) => void
-}
-
-@observer
-class NonInjectedHelmChartDetails extends Component<Props & Dependencies> {
-  @observable chartVersions: HelmChart[];
-  @observable selectedChart?: HelmChart;
-  @observable readme?: string;
-  @observable error?: string;
-
-  private abortController?: AbortController;
-
-  constructor(props: Props & Dependencies) {
-    super(props);
-    makeObservable(this);
-  }
-
-  componentWillUnmount() {
-    this.abortController?.abort();
-  }
-
-  componentDidMount() {
-    disposeOnUnmount(this, [
-      reaction(() => this.props.chart, async ({ name, repo, version }) => {
-        try {
-          this.selectedChart = undefined;
-          this.chartVersions = undefined;
-          this.readme = undefined;
-
-          const { readme, versions } = await getChartDetails(repo, name, { version });
-
-          this.readme = readme;
-          this.chartVersions = versions;
-          this.selectedChart = versions[0];
-        } catch (error) {
-          this.error = error;
-          this.selectedChart = null;
-        }
-      }, {
-        fireImmediately: true,
-      }),
-    ]);
-  }
-=======
   newInstallChartTab: (chart: HelmChart) => void;
 }
->>>>>>> d574d3d018... Replace a bunch of items with dependency injection
 
 const NonInjectedHelmChartDetails = observer(({ newInstallChartTab, chart, hideDetails }: Dependencies & HelmChartDetailsProps) => {
   const [chartVersions] = useState(observable.array<HelmChart>());
@@ -130,25 +79,12 @@ const NonInjectedHelmChartDetails = observer(({ newInstallChartTab, chart, hideD
     } catch (error) {
       setError(String(error));
     }
-<<<<<<< HEAD
-  }
-
-  @boundMethod
-  install() {
-    this.props.createInstallChartTab(this.selectedChart);
-    this.props.hideDetails();
-  }
-
-  renderIntroduction() {
-    const { selectedChart, chartVersions, onVersionChange } = this;
-=======
   };
   const install = ()  => {
     newInstallChartTab(selectedChart);
     hideDetails();
   };
   const renderIntroduction = () => {
->>>>>>> d574d3d018... Replace a bunch of items with dependency injection
     const placeholder = require("./helm-placeholder.svg");
 
     return (
@@ -236,20 +172,6 @@ const NonInjectedHelmChartDetails = observer(({ newInstallChartTab, chart, hideD
   if (!chart) {
     return null;
   }
-<<<<<<< HEAD
-}
-
-export const HelmChartDetails = withInjectables<Dependencies, Props>(
-  NonInjectedHelmChartDetails,
-
-  {
-    getProps: (di, props) => ({
-      createInstallChartTab: di.inject(createInstallChartTabInjectable),
-      ...props,
-    }),
-  },
-);
-=======
 
   return (
     <Drawer
@@ -270,4 +192,3 @@ export const HelmChartDetails = withInjectables<Dependencies, HelmChartDetailsPr
     ...props,
   }),
 });
->>>>>>> d574d3d018... Replace a bunch of items with dependency injection

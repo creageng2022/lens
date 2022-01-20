@@ -11,8 +11,6 @@ import type { DependencyInjectionContainer } from "@ogre-tools/injectable";
 import { getDiForUnitTesting } from "../../../getDiForUnitTesting";
 import { type DiRender, renderFor } from "../../test-utils/renderFor";
 import hotbarManagerInjectable from "../../../../common/hotbar-store/store.injectable";
-import { UserStore } from "../../../../common/user-store";
-import { ThemeStore } from "../../../theme-store/theme.store";
 import { ConfirmDialog } from "../../confirm-dialog";
 import type { HotbarStore } from "../../../../common/hotbar-store/store";
 import mockFs from "mock-fs";
@@ -38,15 +36,10 @@ describe("<HotbarRemoveCommand />", () => {
     di.override(directoryForUserDataInjectable, () => "some-directory-for-user-data");
 
     render = renderFor(di);
-
-    UserStore.createInstance();
-    ThemeStore.createInstance();
   });
 
   afterEach(() => {
     mockFs.restore();
-    ThemeStore.resetInstance();
-    UserStore.resetInstance();
   });
 
   it("renders w/o errors", async () => {

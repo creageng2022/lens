@@ -4,21 +4,23 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import type { CatalogEntity } from "../../common/catalog";
-import { ClusterStore } from "../../common/cluster-store";
-import type { Cluster } from "../../main/cluster";
+import getClusterByIdInjectable from "../../common/cluster-store/get-cluster-by-id.injectable";
+import type { Cluster } from "../../common/cluster/cluster";
 import activeEntityInjectable from "./active-entity.injectable";
 
 interface Dependencies {
   activeEntity: CatalogEntity | undefined | null;
+  getClusterById: (id: string) => Cluster | null;
 }
 
-function activeClusterEntity({ activeEntity }: Dependencies): Cluster | undefined {
-  return ClusterStore.getInstance().getById(activeEntity?.getId());
+function activeClusterEntity({ activeEntity, getClusterById }: Dependencies): Cluster | undefined {
+  return getClusterById(activeEntity?.getId());
 }
 
 const activeClusterEntityInjectable = getInjectable({
   instantiate: (di) => activeClusterEntity({
     activeEntity: di.inject(activeEntityInjectable).get(),
+    getClusterById: di.inject(getClusterByIdInjectable),
   }),
   lifecycle: lifecycleEnum.transient,
 });

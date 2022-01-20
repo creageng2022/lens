@@ -21,15 +21,15 @@ import addToActiveHotbarInjectable from "../../../../common/hotbar-store/add-to-
 import { noop } from "../../../utils";
 import removeByIdFromActiveHotbarInjectable from "../../../../common/hotbar-store/remove-from-active-hotbar.injectable";
 import { getStorageLayerMock } from "../../../utils/__mocks__/storage-helper";
-import createStorageInjectable from "../../../utils/createStorage.injectable";
 import isTableColumnHiddenInjectable from "../../../../common/user-store/is-table-column-hidden.injectable";
 import toggleTableColumnVisibilityInjectable from "../../../../common/user-store/toggle-table-column-visibility.injectable";
-import activeThemeInjectable from "../../../theme-store/active-theme.injectable";
+import activeThemeInjectable from "../../../themes/active-theme.injectable";
 import { computed } from "mobx";
-import type { Theme } from "../../../theme-store/theme.store";
+import type { Theme } from "../../../themes/store";
 import catalogCategoryRegistryInjectable from "../../../catalog/category-registry.injectable";
 import isItemInActiveHotbarInjectable from "../../../../common/hotbar-store/is-added-to-active-hotbar.injectable";
 import loggerInjectable from "../../../../common/logger.injectable";
+import createStorageInjectable from "../../../utils/create-storage/create-storage.injectable";
 
 function timeout(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));

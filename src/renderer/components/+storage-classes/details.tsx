@@ -17,10 +17,11 @@ import type { StorageClassStore } from "./store";
 import { PersistentVolumeDetailsList } from "../+persistent-volumes/details-list";
 import type { PersistentVolumeStore } from "../+persistent-volumes/store";
 import logger from "../../../common/logger";
-import { kubeWatchApi } from "../../../common/k8s-api/kube-watch-api";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import storageClassStoreInjectable from "./store.injectable";
 import persistentVolumeStoreInjectable from "../+persistent-volumes/store.injectable";
+import type { KubeWatchApi } from "../../kube-watch-api/kube-watch-api";
+import kubeWatchApiInjectable from "../../kube-watch-api/kube-watch-api.injectable";
 
 export interface StorageClassDetailsProps extends KubeObjectDetailsProps<StorageClass> {
 }
@@ -28,9 +29,10 @@ export interface StorageClassDetailsProps extends KubeObjectDetailsProps<Storage
 interface Dependencies {
   storageClassStore: StorageClassStore;
   persistentVolumeStore: PersistentVolumeStore;
+  kubeWatchApi: KubeWatchApi;
 }
 
-const NonInjectedStorageClassDetails = observer(({ storageClassStore, persistentVolumeStore, object: storageClass }: Dependencies & StorageClassDetailsProps) => {
+const NonInjectedStorageClassDetails = observer(({ kubeWatchApi, storageClassStore, persistentVolumeStore, object: storageClass }: Dependencies & StorageClassDetailsProps) => {
   useEffect(() => (
     kubeWatchApi.subscribeStores([
       persistentVolumeStore,
@@ -95,6 +97,7 @@ export const StorageClassDetails = withInjectables<Dependencies, StorageClassDet
   getProps: (di, props) => ({
     storageClassStore: di.inject(storageClassStoreInjectable),
     persistentVolumeStore: di.inject(persistentVolumeStoreInjectable),
+    kubeWatchApi: di.inject(kubeWatchApiInjectable),
     ...props,
   }),
 });

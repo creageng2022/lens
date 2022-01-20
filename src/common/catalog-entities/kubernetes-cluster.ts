@@ -5,7 +5,7 @@
 
 import { CatalogEntity, CatalogEntityActionContext, CatalogEntityContextMenuContext, CatalogEntityMetadata, CatalogEntityStatus, CatalogCategory, CatalogCategorySpec } from "../catalog";
 import { clusterActivateHandler, clusterDisconnectHandler } from "../cluster-ipc";
-import { ClusterStore } from "../cluster-store/cluster-store";
+import { ClusterStore } from "../cluster-store/store";
 import { broadcastMessage, requestMain } from "../ipc";
 import { app } from "electron";
 import type { CatalogEntitySpec } from "../catalog/catalog-entity";

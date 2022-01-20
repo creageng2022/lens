@@ -13,7 +13,6 @@ import type { KubeObjectDetailsProps } from "../kube-object-details";
 import { Service } from "../../../common/k8s-api/endpoints";
 import { KubeObjectMeta } from "../kube-object-meta";
 import { ServiceDetailsEndpoint } from "./service-details-endpoint";
-import { kubeWatchApi } from "../../../common/k8s-api/kube-watch-api";
 import logger from "../../../common/logger";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import endpointStoreInjectable from "../+endpoints/store.injectable";
@@ -21,6 +20,8 @@ import { Disposer, disposer } from "../../utils";
 import type { EndpointStore } from "../+endpoints/store";
 import { ContainerPort } from "../container-port/view";
 import watchPortForwardsInjectable from "../../port-forward/watch-port-forwards.injectable";
+import type { KubeWatchApi } from "../../kube-watch-api/kube-watch-api";
+import kubeWatchApiInjectable from "../../kube-watch-api/kube-watch-api.injectable";
 
 export interface ServiceDetailsProps extends KubeObjectDetailsProps<Service> {
 }
@@ -28,9 +29,10 @@ export interface ServiceDetailsProps extends KubeObjectDetailsProps<Service> {
 interface Dependencies {
   endpointStore: EndpointStore;
   watchPortForwards: () => Disposer;
+  kubeWatchApi: KubeWatchApi;
 }
 
-const NonInjectedServiceDetails = observer(({ object: service, endpointStore, watchPortForwards }: Dependencies & ServiceDetailsProps) => {
+const NonInjectedServiceDetails = observer(({ kubeWatchApi, object: service, endpointStore, watchPortForwards }: Dependencies & ServiceDetailsProps) => {
   useEffect(() => disposer(
     kubeWatchApi.subscribeStores([
       endpointStore,
@@ -136,6 +138,7 @@ export const ServiceDetails = withInjectables<Dependencies, ServiceDetailsProps>
   getProps: (di, props) => ({
     endpointStore: di.inject(endpointStoreInjectable),
     watchPortForwards: di.inject(watchPortForwardsInjectable),
+    kubeWatchApi: di.inject(kubeWatchApiInjectable),
     ...props,
   }),
 });

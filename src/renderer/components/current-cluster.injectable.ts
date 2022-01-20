@@ -4,7 +4,7 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { computed } from "mobx";
-import { ClusterStore } from "../../common/cluster-store";
+import { ClusterStore } from "../../common/cluster-store/cluster-store";
 import { getHostedClusterId } from "../utils";
 
 const currentClusterInjectable = getInjectable({

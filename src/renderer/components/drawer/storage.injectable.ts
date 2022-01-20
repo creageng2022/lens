@@ -4,7 +4,7 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import type { StorageLayer } from "../../utils";
-import createStorageInjectable from "../../utils/createStorage.injectable";
+import createStorageInjectable from "../../utils/create-storage/create-storage.injectable";
 
 export const defaultDrawerWidth = 725;
 

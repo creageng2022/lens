@@ -3,9 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 
-import { CatalogCategory, CatalogEntity, CatalogEntityContextMenuContext, CatalogEntityMetadata, CatalogEntityStatus } from "../catalog";
-import { productName } from "../vars";
-import { WeblinkStore } from "../weblink-store";
+import { CatalogCategory, CatalogEntity, CatalogEntityMetadata, CatalogEntityStatus } from "../catalog";
 
 export type WebLinkStatusPhase = "available" | "unavailable";
 
@@ -13,9 +11,9 @@ export interface WebLinkStatus extends CatalogEntityStatus {
   phase: WebLinkStatusPhase;
 }
 
-export type WebLinkSpec = {
+export interface WebLinkSpec {
   url: string;
-};
+}
 
 export class WebLink extends CatalogEntity<CatalogEntityMetadata, WebLinkStatus, WebLinkSpec> {
   public static readonly apiVersion = "entity.k8slens.dev/v1alpha1";
@@ -26,19 +24,6 @@ export class WebLink extends CatalogEntity<CatalogEntityMetadata, WebLinkStatus,
 
   onRun() {
     window.open(this.spec.url, "_blank");
-  }
-
-  onContextMenuOpen(context: CatalogEntityContextMenuContext) {
-    if (this.metadata.source === "local") {
-      context.menuItems.push({
-        title: "Delete",
-        icon: "delete",
-        onClick: () => WeblinkStore.getInstance().removeById(this.metadata.uid),
-        confirm: {
-          message: `Remove Web Link "${this.metadata.name}" from ${productName}?`,
-        },
-      });
-    }
   }
 }
 

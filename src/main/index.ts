@@ -28,8 +28,6 @@ import { pushCatalogToRenderer } from "./catalog-pusher";
 import { HelmRepoManager } from "./helm/helm-repo-manager";
 import configurePackages from "../common/configure-packages";
 import { PrometheusProviderRegistry } from "./prometheus";
-import { HotbarStore } from "../common/hotbar-store/store";
-import { WeblinkStore } from "../common/weblink-store";
 import { SentryInit } from "../common/sentry";
 import { ensureDir } from "fs-extra";
 import { ShellSession } from "./shell-session/shell-session";
@@ -40,20 +38,19 @@ import extensionDiscoveryInjectable from "../extensions/extension-discovery/exte
 import directoryForExesInjectable from "../common/app-paths/directory-for-exes.injectable";
 import initIpcMainHandlersInjectable from "./initializers/init-ipc-main-handlers.injectable";
 import directoryForKubeConfigsInjectable from "../common/app-paths/directory-for-kube-configs.injectable";
-import clusterStoreInjectable from "../common/cluster-store/cluster-store.injectable";
-import userStoreInjectable from "../common/user-store/user-store.injectable";
+import clusterStoreInjectable from "../common/cluster-store/store.injectable";
+import userStoreInjectable from "../common/user-store/store.injectable";
 import kubeconfigSyncManagerInjectable from "./catalog-sources/kubeconfig-sync/manager.injectable";
 import lensProxyInjectableInjectable from "./lens-proxy/lens-proxy.injectable";
 import { initPrometheusProviderRegistry } from "./initializers/metrics-providers";
 import catalogEntityRegistryInjectable from "./catalog/entity-registry.injectable";
 import { generalEntities } from "./catalog-sources/general";
-import { getWeblinksSource } from "./catalog-sources/weblinks";
-import { initClusterMetadataDetectors } from "./initializers/cluster-metadata-detectors";
 import getProxyPortInjectable from "./lens-proxy/get-proxy-port.injectable";
 import clusterManagerInjectable from "./cluster-manager/cluster-manager.injectable";
 import initAppMenuInjectable from "./menu/init-app-menu.injectable";
 import windowManagerInjectable from "./windows/manager.injectable";
 import initTrayIconInjectable from "./tray/init-tray-icon.injectable";
+import getWeblinksSourceInjectable from "./catalog-sources/weblinks-source.injectable";
 
 app.setName(appName);
 
@@ -143,8 +140,10 @@ async function main() {
      * store has migrations that will remove items that previous migrations add
      * if this is not present
      */
+    const getWeblinksSource = di.inject(getWeblinksSourceInjectable);
+
     catalogEntityRegistry.addObservableSource(generalEntities);
-    catalogEntityRegistry.addComputedSource(getWeblinksSource(WeblinkStore.createInstance()));
+    catalogEntityRegistry.addComputedSource(getWeblinksSource());
 
     logger.info("💾 Loading stores");
 
@@ -157,13 +156,9 @@ async function main() {
 
     clusterStore.provideInitialFromMain();
 
-    // HotbarStore depends on: ClusterStore
-    HotbarStore.createInstance();
     HelmRepoManager.createInstance();
 
     const lensProxy = di.inject(lensProxyInjectableInjectable);
-
-    initClusterMetadataDetectors();
 
     try {
       logger.info("🔌 Starting LensProxy");

@@ -6,7 +6,6 @@
 import { readFile } from "fs/promises";
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { CatalogCategoryRegistry } from "../../common/catalog";
-import { ClusterStore } from "../../common/cluster-store";
 import { loadConfigFromString } from "../../common/kube-helpers";
 import { DeleteClusterDialog } from "../components/delete-cluster-dialog";
 import React from "react";
@@ -16,48 +15,53 @@ import { GeneralCategory, KubernetesClusterCategory, WebLinkCategory } from "../
 import { runInAction } from "mobx";
 import { Link } from "react-router-dom";
 import { kubernetesURL, addClusterURL } from "../../common/routes";
-import { UserStore } from "../../common/user-store";
-import { isWindows, isLinux } from "../../common/vars";
+import { isWindows, isLinux, productName } from "../../common/vars";
 import { getAllEntries } from "../components/+preferences/kubeconfig-syncs";
 import { Notifications } from "../components/notifications";
 import { PathPicker } from "../components/path-picker";
 import { multiSet } from "../utils";
-
-async function onClusterDelete(clusterId: string) {
-  const cluster = ClusterStore.getInstance().getById(clusterId);
-
-  if (!cluster) {
-    return console.warn("[KUBERNETES-CLUSTER]: cannot delete cluster, does not exist in store", { clusterId });
-  }
-
-  const { config, error } = loadConfigFromString(await readFile(cluster.kubeConfigPath, "utf-8"));
-
-  if (error) {
-    throw error;
-  }
-
-  DeleteClusterDialog.open({ cluster, config });
-}
-
-async function addSyncEntries(filePaths: string[]) {
-  const entries = await getAllEntries(filePaths);
-
-  runInAction(() => {
-    multiSet(UserStore.getInstance().syncKubeconfigEntries, entries);
-  });
-
-  Notifications.ok(
-    <div>
-      <p>Selected items has been added to Kubeconfig Sync.</p><br/>
-      <p>Check the <Link style={{ textDecoration: "underline" }} to={`${kubernetesURL()}#kube-sync`}>Preferences</Link>{" "}
-      to see full list.</p>
-    </div>,
-  );
-}
+import removeWeblinkByIdInjectable from "../../common/weblinks/remove-by-id.injectable";
+import userStoreInjectable from "../../common/user-store/store.injectable";
+import getClusterByIdInjectable from "../../common/cluster-store/get-cluster-by-id.injectable";
 
 const catalogCategoryRegistryInjectable = getInjectable({
   instantiate: (di) => {
     const openCommandOverlay = di.inject(openCommandDialogInjectable);
+    const removeWeblinkById = di.inject(removeWeblinkByIdInjectable);
+    const userStore = di.inject(userStoreInjectable);
+    const getClusterById = di.inject(getClusterByIdInjectable);
+
+    const addSyncEntries = async (filePaths: string[]) => {
+      const entries = await getAllEntries(filePaths);
+
+      runInAction(() => {
+        multiSet(userStore.syncKubeconfigEntries, entries);
+      });
+
+      Notifications.ok(
+        <div>
+          <p>Selected items has been added to Kubeconfig Sync.</p><br/>
+          <p>Check the <Link style={{ textDecoration: "underline" }} to={`${kubernetesURL()}#kube-sync`}>Preferences</Link>{" "}
+          to see full list.</p>
+        </div>,
+      );
+    };
+    const onClusterDelete = async (clusterId: string) =>{
+      const cluster = getClusterById(clusterId);
+
+      if (!cluster) {
+        return console.warn("[KUBERNETES-CLUSTER]: cannot delete cluster, does not exist in store", { clusterId });
+      }
+
+      const { config, error } = loadConfigFromString(await readFile(cluster.kubeConfigPath, "utf-8"));
+
+      if (error) {
+        throw error;
+      }
+
+      DeleteClusterDialog.open({ cluster, config });
+    };
+
     const registry = new CatalogCategoryRegistry();
     const kubernetesClusterCategory = new KubernetesClusterCategory();
     const webLinkCategory = new WebLinkCategory();
@@ -138,6 +142,19 @@ const catalogCategoryRegistryInjectable = getInjectable({
         title: "Add web link",
         onClick: () => openCommandOverlay(<WeblinkAddCommand />),
       });
+    });
+
+    webLinkCategory.on("contextMenuOpen", (entity, context) => {
+      if (entity.metadata.source === "local") {
+        context.menuItems.push({
+          title: "Delete",
+          icon: "delete",
+          onClick: () => removeWeblinkById(entity.getId()),
+          confirm: {
+            message: `Remove Web Link "${entity.getName()}" from ${productName}?`,
+          },
+        });
+      }
     });
 
     return registry;

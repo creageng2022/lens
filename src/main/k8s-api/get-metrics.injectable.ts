@@ -13,7 +13,11 @@ interface Dependencies {
   k8sRequest: (cluster: Cluster, path: string, options?: RequestPromiseOptions) => Promise<any>;
 }
 
-function getMetrics({ k8sRequest }: Dependencies, cluster: Cluster, prometheusPath: string, queryParams: IMetricsReqParams & { query: string }): Promise<any> {
+export interface GetMetricsReqParams extends IMetricsReqParams {
+  query: string;
+}
+
+function getMetrics({ k8sRequest }: Dependencies, cluster: Cluster, prometheusPath: string, queryParams: GetMetricsReqParams): Promise<any> {
   const prometheusPrefix = cluster.preferences.prometheus?.prefix || "";
   const metricsPath = `/api/v1/namespaces/${prometheusPath}/proxy${prometheusPrefix}/api/v1/query_range`;
 

@@ -11,8 +11,6 @@ import { Pod, PodApi } from "../../../../common/k8s-api/endpoints";
 import { LogResourceSelector } from "../logs/log-resource-selector";
 import type { LogTabData } from "../log-tab/store";
 import { dockerPod, deploymentPod1 } from "./pod.mock";
-import { ThemeStore } from "../../../theme-store/theme.store";
-import { UserStore } from "../../../../common/user-store";
 import mockFs from "mock-fs";
 import type { ConfigurableDependencyInjectionContainer } from "@ogre-tools/injectable";
 import { getDiForUnitTesting } from "../../../getDiForUnitTesting";
@@ -90,14 +88,9 @@ describe("<LogResourceSelector />", () => {
     mockFs({
       "tmp": {},
     });
-
-    UserStore.createInstance();
-    ThemeStore.createInstance();
   });
 
   afterEach(() => {
-    UserStore.resetInstance();
-    ThemeStore.resetInstance();
     mockFs.restore();
   });
 

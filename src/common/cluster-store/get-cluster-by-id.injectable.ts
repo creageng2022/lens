@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import clusterStoreInjectable from "./cluster-store.injectable";
+import clusterStoreInjectable from "./store.injectable";
 
 const getClusterByIdInjectable = getInjectable({
   instantiate: (di) => di.inject(clusterStoreInjectable).getById,

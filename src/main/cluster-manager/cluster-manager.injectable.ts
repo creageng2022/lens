@@ -3,13 +3,13 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import { ClusterStore } from "../../common/cluster-store";
+import clusterStoreInjectable from "../../common/cluster-store/store.injectable";
 import catalogEntityRegistryInjectable from "../catalog/entity-registry.injectable";
 import { ClusterManager } from "./cluster-manager";
 
 const clusterManagerInjectable = getInjectable({
   instantiate: (di) => new ClusterManager({
-    clusterStore: ClusterStore.getInstance(),
+    clusterStore: di.inject(clusterStoreInjectable),
     entityRegistry: di.inject(catalogEntityRegistryInjectable),
   }),
   lifecycle: lifecycleEnum.singleton,

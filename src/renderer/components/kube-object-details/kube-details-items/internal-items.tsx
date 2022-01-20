@@ -11,7 +11,7 @@ import { ConfigMapDetails } from "../../+config-maps";
 import { PodDisruptionBudgetDetails } from "../../+pod-disruption-budgets";
 import { ResourceQuotaDetails } from "../../+resource-quotas";
 import { SecretDetails } from "../../+secrets";
-import { CustomResourceDefinitionDetails } from "../../+custom-resource-definitions";
+import { CustomResourceDefinitionDetails } from "../../+custom-resource";
 import { EventDetails } from "../../+events";
 import { KubeEventDetails } from "../../+events/kube-event-details";
 import { NamespaceDetails } from "../../+namespaces";

@@ -12,16 +12,16 @@ import { Drawer } from "../drawer";
 import type { KubeObject } from "../../../common/k8s-api/kube-object";
 import { Spinner } from "../spinner";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
-import type { CustomResourceDefinitionStore } from "../+custom-resource-definitions/store";
+import type { CustomResourceDefinitionStore } from "../+custom-resource/store";
 import { KubeObjectMenu } from "../kube-object-menu";
-import { CustomResourceDetails } from "../+custom-resource-definitions";
+import { CustomResourceDetails } from "../+custom-resource";
 import { KubeObjectMeta } from "../kube-object-meta";
 import { hideDetails, kubeDetailsUrlParam } from "../kube-detail-params";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import type { KubeObjectDetailComponents } from "./kube-details-items/kube-detail-items";
 import kubeDetailItemsInjectable from "./kube-details-items/kube-details.injectable";
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
-import crdStoreInjectable from "../+custom-resource-definitions/store.injectable";
+import crdStoreInjectable from "../+custom-resource/store.injectable";
 
 export interface KubeObjectDetailsProps<T extends KubeObject = KubeObject> {
   className?: string;

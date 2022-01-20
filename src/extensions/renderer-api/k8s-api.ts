@@ -61,9 +61,12 @@ import customResourceDefinitionApiInjectable from "../../common/k8s-api/endpoint
 import roleBindingStoreInjectable from "../../renderer/components/+role-bindings/store.injectable";
 import clusterRoleStoreInjectable from "../../renderer/components/+cluster-roles/store.injectable";
 import clusterRoleBindingStoreInjectable from "../../renderer/components/+cluster-role-bindings/store.injectable";
-import customResourceDefinitionStoreInjectable from "../../renderer/components/+custom-resource-definitions/store.injectable";
+import customResourceDefinitionStoreInjectable from "../../renderer/components/+custom-resource/store.injectable";
+import { asLegacyGlobalFunctionForExtensionApi } from "../as-legacy-globals-for-extension-api/as-legacy-global-function-for-extension-api";
+import isAllowedResourceInjectable from "../../renderer/utils/allowed-resource.injectable";
 
-export { isAllowedResource } from "../../common/utils/allowed-resource";
+export const isAllowedResource = asLegacyGlobalFunctionForExtensionApi(isAllowedResourceInjectable);
+
 export { ResourceStack } from "../../common/k8s/resource-stack";
 export { KubeObjectStore } from "../../common/k8s-api/kube-object.store";
 export { KubeApi, forCluster, forRemoteCluster } from "../../common/k8s-api/kube-api";
@@ -136,8 +139,8 @@ export type { NamespaceStore } from "../../renderer/components/+namespaces/store
 export type { ServiceAccountStore as ServiceAccountsStore } from "../../renderer/components/+service-accounts/store";
 export type { RoleStore as RolesStore } from "../../renderer/components/+roles/store";
 export type { RoleBindingStore as RoleBindingsStore } from "../../renderer/components/+role-bindings/store";
-export type { CustomResourceDefinitionStore as CRDStore } from "../../renderer/components/+custom-resource-definitions/store";
-export type { CRDResourceStore } from "../../renderer/components/+custom-resource-definitions/resource.store";
+export type { CustomResourceDefinitionStore as CRDStore } from "../../renderer/components/+custom-resource/store";
+export type { CRDResourceStore } from "../../renderer/components/+custom-resource/resource.store";
 
 export const apiManager = asLegacyGlobalObjectForExtensionApi(apiManagerInjectable);
 

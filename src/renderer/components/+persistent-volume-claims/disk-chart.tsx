@@ -9,11 +9,20 @@ import { BarChart, ChartDataSets, memoryOptions } from "../chart";
 import { isMetricsEmpty, normalizeMetrics } from "../../../common/k8s-api/endpoints/metrics.api";
 import { NoMetrics } from "../resource-metrics/no-metrics";
 import { ResourceMetricsContext } from "../resource-metrics";
-import { ThemeStore } from "../../theme-store/theme.store";
+import type { Theme } from "../../themes/store";
+import type { IComputedValue } from "mobx";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import activeThemeInjectable from "../../themes/active-theme.injectable";
 
-export const VolumeClaimDiskChart = observer(() => {
+export interface VolumeClaimDiskChartProps {}
+
+interface Dependencies {
+  activeTheme: IComputedValue<Theme>;
+}
+
+const NonInjectedVolumeClaimDiskChart = observer(({ activeTheme }: Dependencies & VolumeClaimDiskChartProps) => {
   const { metrics, object } = useContext(ResourceMetricsContext);
-  const { chartCapacityColor } = ThemeStore.getInstance().activeTheme.colors;
+  const { chartCapacityColor } = activeTheme.get().colors;
   const id = object.getId();
 
   if (!metrics) return null;
@@ -49,4 +58,11 @@ export const VolumeClaimDiskChart = observer(() => {
       data={{ datasets }}
     />
   );
+});
+
+export const VolumeClaimDiskChart = withInjectables<Dependencies, VolumeClaimDiskChartProps>(NonInjectedVolumeClaimDiskChart, {
+  getProps: (di, props) => ({
+    activeTheme: di.inject(activeThemeInjectable),
+    ...props,
+  }),
 });

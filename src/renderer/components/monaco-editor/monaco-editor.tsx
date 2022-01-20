@@ -6,14 +6,17 @@
 import styles from "./monaco-editor.module.scss";
 import React from "react";
 import { observer } from "mobx-react";
-import { action, computed, makeObservable, observable, reaction } from "mobx";
+import { action, computed, IComputedValue, makeObservable, observable, reaction } from "mobx";
 import { editor, Uri } from "monaco-editor";
 import type { MonacoTheme } from "./monaco-themes";
 import { MonacoValidator, monacoValidators } from "./monaco-validators";
 import { debounce, merge } from "lodash";
 import { cssNames, disposer } from "../../utils";
-import { UserStore } from "../../../common/user-store";
-import { ThemeStore } from "../../theme-store/theme.store";
+import type { UserStore } from "../../../common/user-store";
+import type { Theme } from "../../themes/store";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import activeThemeInjectable from "../../themes/active-theme.injectable";
+import userStoreInjectable from "../../../common/user-store/store.injectable";
 
 export type MonacoEditorId = string;
 
@@ -33,23 +36,22 @@ export interface MonacoEditorProps {
   onDidContentSizeChange?(evt: editor.IContentSizeChangedEvent): void;
   onModelChange?(model: editor.ITextModel, prev?: editor.ITextModel): void;
 }
+interface Dependencies {
+  readonly activeTheme: IComputedValue<Theme>;
+  readonly userStore: UserStore;
+}
 
-export const defaultEditorProps: Partial<MonacoEditorProps> = {
-  language: "yaml",
-  get theme(): MonacoTheme {
-    // theme for monaco-editor defined in `src/renderer/themes/lens-*.json`
-    return ThemeStore.getInstance().activeTheme.monacoTheme;
-  },
-};
+function createUri(id: MonacoEditorId): Uri {
+  return Uri.file(`/monaco-editor/${id}`);
+}
+
+const viewStates = new WeakMap<Uri, editor.ICodeEditorViewState>();
 
 @observer
-export class MonacoEditor extends React.Component<MonacoEditorProps> {
-  static defaultProps = defaultEditorProps as object;
-  static viewStates = new WeakMap<Uri, editor.ICodeEditorViewState>();
-
-  static createUri(id: MonacoEditorId): Uri {
-    return Uri.file(`/monaco-editor/${id}`);
-  }
+class MonacoEditorNonInjected extends React.Component<MonacoEditorProps & Dependencies> {
+  static defaultProps = {
+    language: "yaml",
+  } as object;
 
   public staticId = `editor-id#${Math.round(1e7 * Math.random())}`;
   public dispose = disposer();
@@ -64,9 +66,13 @@ export class MonacoEditor extends React.Component<MonacoEditorProps> {
   @observable dimensions: { width?: number, height?: number } = {};
   @observable unmounting = false;
 
-  constructor(props: MonacoEditorProps) {
+  constructor(props: MonacoEditorProps & Dependencies) {
     super(props);
     makeObservable(this);
+  }
+
+  get theme() {
+    return this.props.theme ?? this.props.activeTheme.get().monacoTheme;
   }
 
   @computed get id() {
@@ -74,7 +80,7 @@ export class MonacoEditor extends React.Component<MonacoEditorProps> {
   }
 
   @computed get model(): editor.ITextModel {
-    const uri = MonacoEditor.createUri(this.id);
+    const uri = createUri(this.id);
     const model = editor.getModel(uri);
 
     if (model) {
@@ -88,7 +94,7 @@ export class MonacoEditor extends React.Component<MonacoEditorProps> {
 
   @computed get options(): editor.IStandaloneEditorConstructionOptions {
     return merge({},
-      UserStore.getInstance().editorConfiguration,
+      this.props.userStore.editorConfiguration,
       this.props.options,
     );
   }
@@ -141,11 +147,11 @@ export class MonacoEditor extends React.Component<MonacoEditorProps> {
    * @param {editor.ITextModel} model
    */
   private saveViewState(model: editor.ITextModel) {
-    MonacoEditor.viewStates.set(model.uri, this.editor.saveViewState());
+    viewStates.set(model.uri, this.editor.saveViewState());
   }
 
   private restoreViewState(model: editor.ITextModel) {
-    const viewState = MonacoEditor.viewStates.get(model.uri);
+    const viewState = viewStates.get(model.uri);
 
     if (viewState) {
       this.editor.restoreViewState(viewState);
@@ -282,3 +288,11 @@ export class MonacoEditor extends React.Component<MonacoEditorProps> {
     );
   }
 }
+
+export const MonacoEditor = withInjectables<Dependencies, MonacoEditorProps>(MonacoEditorNonInjected, {
+  getProps: (di, props) => ({
+    activeTheme: di.inject(activeThemeInjectable),
+    userStore: di.inject(userStoreInjectable),
+    ...props,
+  }),
+});

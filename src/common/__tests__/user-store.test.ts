@@ -4,6 +4,17 @@
  */
 
 import mockFs from "mock-fs";
+import { Console } from "console";
+import { SemVer } from "semver";
+import electron from "electron";
+import { stdout, stderr } from "process";
+import { getDisForUnitTesting } from "../../test-utils/get-dis-for-unit-testing";
+import userStoreInjectable from "../user-store/store.injectable";
+import type { DependencyInjectionContainer } from "@ogre-tools/injectable";
+import directoryForUserDataInjectable from "../app-paths/directory-for-user-data.injectable";
+import type { ClusterStoreModel } from "../cluster-store/store";
+import { defaultTheme } from "../vars";
+import type { UserStore } from "../user-store";
 
 jest.mock("electron", () => ({
   app: {
@@ -20,18 +31,6 @@ jest.mock("electron", () => ({
     handle: jest.fn(),
   },
 }));
-
-import { UserStore } from "../user-store";
-import { Console } from "console";
-import { SemVer } from "semver";
-import electron from "electron";
-import { stdout, stderr } from "process";
-import { getDisForUnitTesting } from "../../test-utils/get-dis-for-unit-testing";
-import userStoreInjectable from "../user-store/user-store.injectable";
-import type { DependencyInjectionContainer } from "@ogre-tools/injectable";
-import directoryForUserDataInjectable from "../app-paths/directory-for-user-data.injectable";
-import type { ClusterStoreModel } from "../cluster-store/cluster-store";
-import { defaultTheme } from "../vars";
 
 console = new Console(stdout, stderr);
 
@@ -64,7 +63,6 @@ describe("user store tests", () => {
 
     afterEach(() => {
       mockFs.restore();
-      UserStore.resetInstance();
     });
 
     it("allows setting and retrieving lastSeenAppVersion", () => {
@@ -130,7 +128,6 @@ describe("user store tests", () => {
     });
 
     afterEach(() => {
-      UserStore.resetInstance();
       mockFs.restore();
     });
 

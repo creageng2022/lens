@@ -5,7 +5,7 @@
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { computed, IComputedValue } from "mobx";
-import customResourceDefinitionsInjectable from "../../+custom-resource-definitions/custom-resources.injectable";
+import customResourceDefinitionsInjectable from "../../+custom-resource/custom-resource-definitions.injectable";
 import type { CustomResourceDefinition } from "../../../../common/k8s-api/endpoints";
 import type { LensRendererExtension } from "../../../../extensions/lens-renderer-extension";
 import rendererExtensionsInjectable from "../../../../extensions/renderer-extensions.injectable";

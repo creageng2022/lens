@@ -4,22 +4,22 @@
  */
 
 import debounce from "lodash/debounce";
-import { reaction } from "mobx";
+import { IComputedValue, reaction } from "mobx";
 import { Terminal as XTerm } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import type { DockStore, TabId } from "../store";
 import { TerminalApi, TerminalChannels } from "../../../api/terminal-api";
-import { ThemeStore } from "../../../theme-store/theme.store";
 import { disposer } from "../../../utils";
 import { isMac } from "../../../../common/vars";
 import { once } from "lodash";
-import { UserStore } from "../../../../common/user-store";
 import { clipboard } from "electron";
 import logger from "../../../../common/logger";
 import fontPath from "../../fonts/roboto-mono-nerd.ttf";
 
 interface Dependencies {
-  dockStore: DockStore;
+  readonly dockStore: DockStore;
+  readonly terminalColors: IComputedValue<Record<string, string>>;
+  readonly terminalCopyOnSelect: IComputedValue<boolean>;
 }
 
 export class Terminal {
@@ -92,7 +92,7 @@ export class Terminal {
     window.addEventListener("resize", this.onResize);
 
     this.disposer.push(
-      reaction(() => ThemeStore.getInstance().xtermColors, colors => {
+      reaction(() => this.dependencies.terminalColors.get(), colors => {
         this.xterm?.setOption("theme", colors);
       }, {
         fireImmediately: true,
@@ -175,7 +175,7 @@ export class Terminal {
   onContextMenu = () => {
     if (
       // don't paste if user hasn't turned on the feature
-      UserStore.getInstance().terminalCopyOnSelect
+      this.dependencies.terminalCopyOnSelect.get()
 
       // don't paste if the clipboard doesn't have text
       && clipboard.availableFormats().includes("text/plain")
@@ -187,7 +187,7 @@ export class Terminal {
   onSelectionChange = () => {
     const selection = this.xterm.getSelection().trim();
 
-    if (UserStore.getInstance().terminalCopyOnSelect && selection) {
+    if (this.dependencies.terminalCopyOnSelect.get() && selection) {
       clipboard.writeText(selection);
     }
   };

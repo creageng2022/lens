@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import userStoreInjectable from "./user-store.injectable";
+import userStoreInjectable from "./store.injectable";
 
 const kubeconfigSyncEntriesInjectable = getInjectable({
   instantiate: (di) => di.inject(userStoreInjectable).syncKubeconfigEntries,

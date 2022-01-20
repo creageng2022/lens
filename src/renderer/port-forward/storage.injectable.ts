@@ -4,7 +4,7 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import type { StorageLayer } from "../utils";
-import createStorageInjectable from "../utils/createStorage.injectable";
+import createStorageInjectable from "../utils/create-storage/create-storage.injectable";
 import type { ForwardedPort } from "./port-forward";
 
 let storage: StorageLayer<ForwardedPort[] | undefined>;

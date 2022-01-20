@@ -5,7 +5,7 @@
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import type { StorageLayer } from "../../utils";
-import createStorageInjectable from "../../utils/createStorage.injectable";
+import createStorageInjectable from "../../utils/create-storage/create-storage.injectable";
 import { DockStorageState, DockStore, TabKind } from "./store";
 
 let storage: StorageLayer<DockStorageState>;

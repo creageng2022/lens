@@ -10,13 +10,22 @@ import { NoMetrics } from "../resource-metrics/no-metrics";
 import { ResourceMetricsContext } from "../resource-metrics";
 import { observer } from "mobx-react";
 import type { ChartOptions, ChartPoint } from "chart.js";
-import { ThemeStore } from "../../theme-store/theme.store";
+import type { Theme } from "../../themes/store";
 import { mapValues } from "lodash";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import type { IComputedValue } from "mobx";
+import activeThemeInjectable from "../../themes/active-theme.injectable";
 
-export const NodeCharts = observer(() => {
+export interface NodeChartsProps {}
+
+interface Dependencies {
+  activeTheme: IComputedValue<Theme>;
+}
+
+const NonInjectedNodeCharts = observer(({ activeTheme }: Dependencies & NodeChartsProps) => {
   const { metrics, tabId, object } = useContext(ResourceMetricsContext);
   const id = object.getId();
-  const { chartCapacityColor } = ThemeStore.getInstance().activeTheme.colors;
+  const { chartCapacityColor } = activeTheme.get().colors;
 
   if (!metrics) {
     return null;
@@ -177,4 +186,11 @@ export const NodeCharts = observer(() => {
       data={{ datasets: datasets[tabId] }}
     />
   );
+});
+
+export const NodeCharts = withInjectables<Dependencies, NodeChartsProps>(NonInjectedNodeCharts, {
+  getProps: (di, props) => ({
+    activeTheme: di.inject(activeThemeInjectable),
+    ...props,
+  }),
 });

@@ -22,11 +22,12 @@ import { PodDetailsList } from "../+pods/details-list";
 import { KubeObjectMeta } from "../kube-object-meta";
 import { ClusterMetricsResourceType } from "../../../common/cluster-types";
 import logger from "../../../common/logger";
-import { kubeWatchApi } from "../../../common/k8s-api/kube-watch-api";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import daemonSetStoreInjectable from "./store.injectable";
 import podStoreInjectable from "../+pods/store.injectable";
 import isMetricHiddenInjectable from "../../utils/is-metrics-hidden.injectable";
+import type { KubeWatchApi } from "../../kube-watch-api/kube-watch-api";
+import kubeWatchApiInjectable from "../../kube-watch-api/kube-watch-api.injectable";
 
 export interface DaemonSetDetailsProps extends KubeObjectDetailsProps<DaemonSet> {
 }
@@ -35,9 +36,10 @@ interface Dependencies {
   daemonSetStore: DaemonSetStore;
   podStore: PodStore;
   isMetricHidden: boolean;
+  kubeWatchApi: KubeWatchApi;
 }
 
-const NonInjectedDaemonSetDetails = observer(({ isMetricHidden, podStore, daemonSetStore, object: daemonSet }: Dependencies & DaemonSetDetailsProps) => {
+const NonInjectedDaemonSetDetails = observer(({ kubeWatchApi, isMetricHidden, podStore, daemonSetStore, object: daemonSet }: Dependencies & DaemonSetDetailsProps) => {
   const [metrics, setMetrics] = useState<IPodMetrics | null>(null);
 
   useEffect(() => setMetrics(null), [daemonSet]);
@@ -126,6 +128,7 @@ export const DaemonSetDetails = withInjectables<Dependencies, DaemonSetDetailsPr
     isMetricHidden: di.inject(isMetricHiddenInjectable, {
       metricType: ClusterMetricsResourceType.DaemonSet,
     }),
+    kubeWatchApi: di.inject(kubeWatchApiInjectable),
     ...props,
   }),
 });

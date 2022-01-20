@@ -29,8 +29,8 @@ import catalogPreviousActiveTabInjectable from "./catalog-previous-tab.injectabl
 import renderEntityContextMenuItemInjectable, { RenderEntityContextMenuItem } from "../../catalog/render-context-menu-item.injectable";
 import onRunInjectable from "../../catalog/on-run.injectable";
 import catalogCategoriesInjectable from "../../catalog/categories.injectable";
-import type { CategoryColumns, GetCategoryColumnsParams } from "./get-category-columns.injectable";
-import getCategoryColumnsInjectable from "./get-category-columns.injectable";
+import type { CategoryColumns, GetCategoryColumnsParams } from "./category-columns/get-category-columns.injectable";
+import getCategoryColumnsInjectable from "./category-columns/get-category-columns.injectable";
 
 export interface CatalogProps extends RouteComponentProps<CatalogViewRouteParam> {
 

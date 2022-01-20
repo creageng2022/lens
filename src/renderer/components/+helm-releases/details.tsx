@@ -8,7 +8,7 @@ import "./details.scss";
 import React, { useEffect, useState } from "react";
 import groupBy from "lodash/groupBy";
 import isEqual from "lodash/isEqual";
-import { reaction } from "mobx";
+import { IComputedValue, reaction } from "mobx";
 import { Link } from "react-router-dom";
 import kebabCase from "lodash/kebabCase";
 import { getRelease, getReleaseValues, HelmRelease, IReleaseDetails } from "../../../common/k8s-api/endpoints/helm-release.api";
@@ -22,7 +22,6 @@ import { Table, TableCell, TableHead, TableRow } from "../table";
 import { Button } from "../button";
 import type { ReleaseStore } from "./store";
 import { Notifications } from "../notifications";
-import { ThemeStore } from "../../theme-store/theme.store";
 import type { ApiManager } from "../../../common/k8s-api/api-manager";
 import { SubTitle } from "../layout/sub-title";
 import type { SecretStore } from "../+secrets/store";
@@ -36,6 +35,8 @@ import newUpgradeChartTabInjectable from "../dock/upgrade-chart/create-tab.injec
 import apiManagerInjectable from "../../../common/k8s-api/api-manager.injectable";
 import secretStoreInjectable from "../+secrets/store.injectable";
 import releaseStoreInjectable from "./store.injectable";
+import activeThemeInjectable from "../../themes/active-theme.injectable";
+import type { Theme } from "../../themes/store";
 
 export interface ReleaseDetailsProps {
   release: HelmRelease;
@@ -47,6 +48,7 @@ interface Dependencies {
   apiManager: ApiManager;
   secretStore: SecretStore;
   releaseStore: ReleaseStore;
+  activeTheme: IComputedValue<Theme>;
 }
 
 const NonInjectedReleaseDetails = observer(({
@@ -56,6 +58,7 @@ const NonInjectedReleaseDetails = observer(({
   apiManager,
   secretStore,
   releaseStore,
+  activeTheme,
 }: Dependencies & ReleaseDetailsProps) => {
   const [details, setDetails] = useState<IReleaseDetails | null>(null);
   const [values, setValues] = useState("");
@@ -291,7 +294,7 @@ const NonInjectedReleaseDetails = observer(({
 
   return (
     <Drawer
-      className={cssNames("ReleaseDetails", ThemeStore.getInstance().activeTheme.type)}
+      className={cssNames("ReleaseDetails", activeTheme.get().type)}
       usePortal={true}
       open
       title={`Release: ${release.getName()}`}
@@ -315,6 +318,7 @@ export const ReleaseDetails = withInjectables<Dependencies, ReleaseDetailsProps>
     apiManager: di.inject(apiManagerInjectable),
     secretStore: di.inject(secretStoreInjectable),
     releaseStore: di.inject(releaseStoreInjectable),
+    activeTheme: di.inject(activeThemeInjectable),
     ...props,
   }),
 });

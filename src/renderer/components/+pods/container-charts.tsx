@@ -9,12 +9,21 @@ import { BarChart, cpuOptions, memoryOptions } from "../chart";
 import { isMetricsEmpty, normalizeMetrics } from "../../../common/k8s-api/endpoints/metrics.api";
 import { NoMetrics } from "../resource-metrics/no-metrics";
 import { ResourceMetricsContext } from "../resource-metrics";
-import { ThemeStore } from "../../theme-store/theme.store";
 import { mapValues } from "lodash";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import type { IComputedValue } from "mobx";
+import activeThemeInjectable from "../../themes/active-theme.injectable";
+import type { Theme } from "../../themes/store";
 
-export const ContainerCharts = observer(() => {
+export interface ContainerChartsProps {}
+
+interface Dependencies {
+  activeTheme: IComputedValue<Theme>;
+}
+
+const NonInjectedContainerCharts = observer(({ activeTheme }: Dependencies & ContainerChartsProps) => {
   const { metrics, tabId } = useContext(ResourceMetricsContext);
-  const { chartCapacityColor } = ThemeStore.getInstance().activeTheme.colors;
+  const { chartCapacityColor } = activeTheme.get().colors;
 
   if (!metrics) return null;
   if (isMetricsEmpty(metrics)) return <NoMetrics/>;
@@ -115,4 +124,11 @@ export const ContainerCharts = observer(() => {
       data={{ datasets: datasets[tabId] }}
     />
   );
+});
+
+export const ContainerCharts = withInjectables<Dependencies, ContainerChartsProps>(NonInjectedContainerCharts, {
+  getProps: (di, props) => ({
+    activeTheme: di.inject(activeThemeInjectable),
+    ...props,
+  }),
 });

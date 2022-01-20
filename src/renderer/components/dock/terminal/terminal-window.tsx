@@ -10,18 +10,21 @@ import { observer } from "mobx-react";
 import { cssNames, disposer } from "../../../utils";
 import type { Terminal } from "./terminal";
 import type { TerminalStore } from "./store";
-import { ThemeStore } from "../../../theme-store/theme.store";
+import type { Theme } from "../../../themes/store";
 import { TabKind, TabId, DockStore } from "../store";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import dockStoreInjectable from "../store.injectable";
 import terminalStoreInjectable from "./store.injectable";
+import activeThemeInjectable from "../../../themes/active-theme.injectable";
+import type { IComputedValue } from "mobx";
 
 interface Dependencies {
   dockStore: DockStore;
   terminalStore: TerminalStore;
+  activeTheme: IComputedValue<Theme>;
 }
 
-const NonInjectedTerminalWindow = observer(({ dockStore, terminalStore }: Dependencies) => {
+const NonInjectedTerminalWindow = observer(({ dockStore, terminalStore, activeTheme }: Dependencies) => {
   const element = useRef<HTMLDivElement>();
   const [terminal, setTerminal] = useState<Terminal | null>(null);
 
@@ -48,7 +51,7 @@ const NonInjectedTerminalWindow = observer(({ dockStore, terminalStore }: Depend
 
   return (
     <div
-      className={cssNames("TerminalWindow", ThemeStore.getInstance().activeTheme.type)}
+      className={cssNames("TerminalWindow", activeTheme.get().type)}
       ref={element}
     />
   );
@@ -58,6 +61,7 @@ export const TerminalWindow = withInjectables<Dependencies>(NonInjectedTerminalW
   getProps: (di, props) => ({
     dockStore: di.inject(dockStoreInjectable),
     terminalStore: di.inject(terminalStoreInjectable),
+    activeTheme: di.inject(activeThemeInjectable),
     ...props,
   }),
 });

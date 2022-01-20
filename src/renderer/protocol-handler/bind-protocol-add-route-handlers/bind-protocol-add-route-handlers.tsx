@@ -6,7 +6,7 @@
 import React from "react";
 import type { LensProtocolRouterRenderer } from "../lens-protocol-router-renderer/lens-protocol-router-renderer";
 import { navigate } from "../../navigation/helpers";
-import { ClusterStore } from "../../../common/cluster-store/cluster-store";
+import { ClusterStore } from "../../../common/cluster-store/store";
 import { EXTENSION_NAME_MATCH, EXTENSION_PUBLISHER_MATCH, LensProtocolRouter } from "../../../common/protocol-handler";
 import { Notifications } from "../../components/notifications";
 import * as routes from "../../../common/routes";

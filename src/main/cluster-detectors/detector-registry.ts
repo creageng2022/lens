@@ -5,37 +5,42 @@
 
 import { observable } from "mobx";
 import type { ClusterMetadata } from "../../common/cluster-types";
-import { Singleton } from "../../common/utils";
 import type { Cluster } from "../../common/cluster/cluster";
-import type { BaseClusterDetector, ClusterDetectionResult } from "./base-cluster-detector";
+import type { BaseClusterDetector, BaseClusterDetectorDependencies, ClusterDetectionResult } from "./base-cluster-detector";
 
-export class DetectorRegistry extends Singleton {
-  registry = observable.array<typeof BaseClusterDetector>([], { deep: false });
+export interface DetectorRegistryDependencies extends BaseClusterDetectorDependencies {
+}
 
-  add(detectorClass: typeof BaseClusterDetector): this {
+export class DetectorRegistry {
+  registry = observable.array<new (cluster: Cluster, deps: BaseClusterDetectorDependencies) => BaseClusterDetector>([], { deep: false });
+
+  constructor(protected readonly dependencies: DetectorRegistryDependencies) {}
+
+  add(detectorClass: new (cluster: Cluster, deps: BaseClusterDetectorDependencies) => BaseClusterDetector) {
     this.registry.push(detectorClass);
-
-    return this;
   }
 
   async detectForCluster(cluster: Cluster): Promise<ClusterMetadata> {
     const results: { [key: string]: ClusterDetectionResult } = {};
 
     for (const detectorClass of this.registry) {
-      const detector = new detectorClass(cluster);
+      const detector = new detectorClass(cluster, this.dependencies);
 
       try {
         const data = await detector.detect();
 
-        if (!data) continue;
-        const existingValue = results[detector.key];
+        if (data) {
+          const existingValue = results[detector.key];
 
-        if (existingValue && existingValue.accuracy > data.accuracy) continue; // previous value exists and is more accurate
-        results[detector.key] = data;
+          if (!existingValue || existingValue.accuracy <= data.accuracy) {
+            results[detector.key] = data;
+          }
+        }
       } catch (e) {
         // detector raised error, do nothing
       }
     }
+
     const metadata: ClusterMetadata = {};
 
     for (const [key, result] of Object.entries(results)) {

@@ -10,7 +10,7 @@ import { observer } from "mobx-react";
 import type { RouteComponentProps } from "react-router";
 import { ClusterStatus } from "./cluster-status";
 import type { Cluster } from "../../../common/cluster/cluster";
-import { ClusterStore } from "../../../common/cluster-store/cluster-store";
+import { ClusterStore } from "../../../common/cluster-store/store";
 import type { ClusterFrameHandler } from "./cluster-frame-handler";
 import { requestMain } from "../../../common/ipc";
 import { clusterActivateHandler } from "../../../common/cluster-ipc";

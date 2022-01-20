@@ -3,7 +3,6 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 
-export { isAllowedResource } from "../../common/utils/allowed-resource";
 export { ResourceStack } from "../../common/k8s/resource-stack";
 export { KubeApi, forCluster, forRemoteCluster } from "../../common/k8s-api/kube-api";
 export { KubeObject, KubeStatus } from "../../common/k8s-api/kube-object";

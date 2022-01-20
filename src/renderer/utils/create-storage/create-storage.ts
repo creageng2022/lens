@@ -12,6 +12,7 @@ import { getHostedClusterId } from "../../../common/utils";
 import type { JsonValue } from "type-fest";
 import { isTestEnv } from "../../../common/vars";
 import logger from "../../../common/logger";
+import type { StorageLayer } from "..";
 
 const storage = observable({
   initialized: false,
@@ -28,7 +29,7 @@ interface Dependencies {
 /**
  * Creates a helper for saving data under the "key" intended for window.localStorage
  */
-export async function createStorage<T>({ directoryForLensLocalStorage, readJsonFile, writeJsonFile }: Dependencies, key: string, defaultValue: T) {
+export async function createStorage<T>({ directoryForLensLocalStorage, readJsonFile, writeJsonFile }: Dependencies, key: string, defaultValue: T): Promise<StorageLayer<T>> {
   const { logPrefix } = StorageHelper;
 
   if (!storage.initialized) {

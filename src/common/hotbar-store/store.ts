@@ -8,15 +8,17 @@ import { BaseStore } from "../base-store";
 import { toJS } from "../utils";
 import { catalogEntity } from "../../main/catalog-sources/general";
 import { defaultHotbarCells, getEmptyHotbar, CreateHotbarData, CreateHotbarOptions } from "./hotbar-types";
-import { ipcMain } from "electron";
-import { asLegacyGlobalObjectForExtensionApi } from "../../extensions/as-legacy-globals-for-extension-api/as-legacy-global-object-for-extension-api";
-import hotbarStoreMigrationsInjectable from "../migrations/hotbar-store/migrations.injectable";
 import { Hotbar } from "./hotbar";
 import logger from "../logger";
+import type { Migrations } from "conf/dist/source/types";
 
 export interface HotbarStoreModel {
   hotbars: Required<CreateHotbarData>[];
   activeHotbarId: string;
+}
+
+export interface HotbarStoreDependencies {
+  migrations: Migrations<HotbarStoreModel> | undefined;
 }
 
 export class HotbarStore extends BaseStore<HotbarStoreModel> {
@@ -24,16 +26,14 @@ export class HotbarStore extends BaseStore<HotbarStoreModel> {
   @observable hotbars: Hotbar[] = [];
   @observable private _activeHotbarId: string;
 
-  constructor() {
+  constructor({ migrations }: HotbarStoreDependencies) {
     super({
       configName: "lens-hotbar-store",
       accessPropertiesByDotNotation: false, // To make dots safe in cluster context names
       syncOptions: {
         equals: comparer.structural,
       },
-      migrations: ipcMain
-        ? asLegacyGlobalObjectForExtensionApi(hotbarStoreMigrationsInjectable)
-        : undefined,
+      migrations,
     });
     makeObservable(this);
     this.load();
@@ -166,25 +166,23 @@ export class HotbarStore extends BaseStore<HotbarStoreModel> {
   }
 
   switchToPrevious() {
-    const hotbarStore = HotbarStore.getInstance();
-    let index = hotbarStore.activeHotbarIndex - 1;
+    let index = this.activeHotbarIndex - 1;
 
     if (index < 0) {
-      index = hotbarStore.hotbars.length - 1;
+      index = this.hotbars.length - 1;
     }
 
-    hotbarStore.setActiveHotbar(index);
+    this.setActiveHotbar(index);
   }
 
   switchToNext() {
-    const hotbarStore = HotbarStore.getInstance();
-    let index = hotbarStore.activeHotbarIndex + 1;
+    let index = this.activeHotbarIndex + 1;
 
-    if (index >= hotbarStore.hotbars.length) {
+    if (index >= this.hotbars.length) {
       index = 0;
     }
 
-    hotbarStore.setActiveHotbar(index);
+    this.setActiveHotbar(index);
   }
 
   getDisplayLabel(hotbar: Hotbar): string {

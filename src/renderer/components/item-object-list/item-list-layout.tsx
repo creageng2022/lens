@@ -19,7 +19,7 @@ import type { ItemObject, ItemStore } from "../../../common/item.store";
 import { SearchInputUrlProps, SearchInputUrl } from "../input";
 import { Filter, FilterType, pageFilters } from "./page-filters.store";
 import { PageFiltersList } from "./page-filters-list";
-import type { Theme } from "../../theme-store/theme.store";
+import type { Theme } from "../../themes/store";
 import { MenuActions } from "../menu/menu-actions";
 import { MenuItem } from "../menu";
 import { Checkbox } from "../checkbox";
@@ -29,7 +29,7 @@ import type { ItemListLayoutState } from "./storage.injectable";
 import itemListLayoutStorageInjectable from "./storage.injectable";
 import isTableColumnHiddenInjectable from "../../../common/user-store/is-table-column-hidden.injectable";
 import toggleTableColumnVisibilityInjectable from "../../../common/user-store/toggle-table-column-visibility.injectable";
-import activeThemeInjectable from "../../theme-store/active-theme.injectable";
+import activeThemeInjectable from "../../themes/active-theme.injectable";
 
 export type SearchFilter<I extends ItemObject> = (item: I) => string | number | (string | number)[];
 export type SearchFilters<I extends ItemObject> = Record<string, SearchFilter<I>>;

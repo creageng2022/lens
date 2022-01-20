@@ -20,9 +20,6 @@ import { DefaultProps } from "./mui-base-theme";
 import configurePackages from "../common/configure-packages";
 import * as initializers from "./initializers";
 import logger from "../common/logger";
-import { HotbarStore } from "../common/hotbar-store/store";
-import { WeblinkStore } from "../common/weblink-store";
-import { ThemeStore } from "./theme-store/theme.store";
 import { SentryInit } from "../common/sentry";
 import { registerCustomThemes } from "./components/monaco-editor";
 import { getDi } from "./getDi";
@@ -30,8 +27,8 @@ import { DiContextProvider } from "@ogre-tools/injectable-react";
 import extensionLoaderInjectable from "../extensions/extension-loader/extension-loader.injectable";
 import extensionDiscoveryInjectable from "../extensions/extension-discovery/extension-discovery.injectable";
 import extensionInstallationStateStoreInjectable from "../extensions/extension-installation-state-store/extension-installation-state-store.injectable";
-import clusterStoreInjectable from "../common/cluster-store/cluster-store.injectable";
-import userStoreInjectable from "../common/user-store/user-store.injectable";
+import clusterStoreInjectable from "../common/cluster-store/store.injectable";
+import userStoreInjectable from "../common/user-store/store.injectable";
 import initRootFrameInjectable from "./frames/root-frame/init-root-frame/init-root-frame.injectable";
 import initClusterFrameInjectable from "./frames/cluster-frame/init-cluster-frame/init-cluster-frame.injectable";
 
@@ -93,13 +90,6 @@ async function bootstrap() {
   const clusterStore = di.inject(clusterStoreInjectable);
 
   await clusterStore.loadInitialOnRenderer();
-
-  // HotbarStore depends on: ClusterStore
-  HotbarStore.createInstance();
-
-  // ThemeStore depends on: UserStore
-  ThemeStore.createInstance();
-  WeblinkStore.createInstance();
 
   const extensionInstallationStateStore = di.inject(extensionInstallationStateStoreInjectable);
 
