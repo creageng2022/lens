@@ -12,13 +12,14 @@ const routerInjectable = getInjectable({
   instantiate: (di) => {
     const router = new Router();
     const routePortForward = di.inject(routePortForwardInjectable);
-    const metricsRoute = di.inject(metricsRouteInjectable);
 
     router.addRoute("post", `${apiPrefix}/pods/port-forward/{namespace}/{resourceType}/{resourceName}`, routePortForward);
 
     // Metrics API
-    router.addRoute("post", `${apiPrefix}/metrics`, metricsRoute.routeMetrics);
-    router.addRoute("get", `${apiPrefix}/metrics/providers`, metricsRoute.routeMetricsProviders);
+    const { routeMetrics, routeMetricsProviders } = di.inject(metricsRouteInjectable);
+
+    router.addRoute("post", `${apiPrefix}/metrics`, routeMetrics);
+    router.addRoute("get", `${apiPrefix}/metrics/providers`, routeMetricsProviders);
 
     return router;
   },

@@ -11,7 +11,7 @@ import * as Mobx from "mobx";
 import * as LensExtensionsCommonApi from "../extensions/common-api";
 import * as LensExtensionsMainApi from "../extensions/main-api";
 import { app, autoUpdater, dialog, powerMonitor } from "electron";
-import { appName, isIntegrationTesting, isWindows, productName } from "../common/vars";
+import { appName, isIntegrationTesting, isMac, isWindows, productName } from "../common/vars";
 import { shellSync } from "./shell-sync";
 import { mangleProxyEnv } from "./proxy-env";
 import { registerFileProtocol } from "../common/register-protocol";
@@ -49,17 +49,22 @@ import initAppMenuInjectable from "./menu/init-app-menu.injectable";
 import windowManagerInjectable from "./windows/manager.injectable";
 import initTrayIconInjectable from "./tray/init-tray-icon.injectable";
 import getWeblinksSourceInjectable from "./catalog-sources/weblinks-source.injectable";
-import initializeSentryReportingInjectable from "../common/sentry";
+import initializeSentryReportingInjectable from "../common/sentry.injectable";
 import startUpdateCheckingInjectable from "./app-updater/start-update-checking.injectable";
 
 app.setName(appName);
 
 async function main() {
+  console.log("1");
   const di = getDi();
+
+  console.log("2");
   const onCloseCleanup = disposer();
   const onQuitCleanup = disposer();
 
   await di.runSetups();
+  console.log("3");
+
   injectSystemCAs();
   di.inject(initializeSentryReportingInjectable)();
 
@@ -75,6 +80,8 @@ async function main() {
     app.disableHardwareAcceleration();
   }
 
+  console.log("4");
+
   logger.debug("[APP-MAIN] initializing remote");
   initializeRemote();
 
@@ -84,6 +91,8 @@ async function main() {
   mangleProxyEnv();
 
   const initIpcMainHandlers = di.inject(initIpcMainHandlersInjectable);
+
+  console.log("5");
 
   logger.debug("[APP-MAIN] initializing ipc main handlers");
   initIpcMainHandlers();
@@ -119,6 +128,8 @@ async function main() {
   });
 
   app.on("ready", async () => {
+    console.log("4");
+
     const directoryForExes = di.inject(directoryForExesInjectable);
     const catalogEntityRegistry = di.inject(catalogEntityRegistryInjectable);
 
@@ -210,6 +221,14 @@ async function main() {
     installDeveloperTools();
 
     logger.info("🖥️  Starting WindowManager");
+
+    // Start the app without showing the main window when auto starting on login
+    // (On Windows and Linux, we get a flag. On MacOS, we get special API.)
+    const startHidden = process.argv.includes("--hidden") || (isMac && app.getLoginItemSettings().wasOpenedAsHidden);
+
+    if (!startHidden) {
+      di.inject(windowManagerInjectable).ensureMainWindow();
+    }
 
     const initAppMenu = di.inject(initAppMenuInjectable);
     const initTrayIcon = di.inject(initTrayIconInjectable);

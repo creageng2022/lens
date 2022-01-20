@@ -31,7 +31,7 @@ import userStoreInjectable from "../common/user-store/store.injectable";
 import initRootFrameInjectable from "./frames/root-frame/init-root-frame/init-root-frame.injectable";
 import initClusterFrameInjectable from "./frames/cluster-frame/init-cluster-frame/init-cluster-frame.injectable";
 import isAllowedResourceInjectable from "./utils/allowed-resource.injectable";
-import initializeSentryReportingInjectable from "../common/sentry";
+import initializeSentryReportingInjectable from "../common/sentry.injectable";
 
 configurePackages(); // global packages
 registerCustomThemes(); // monaco editor themes

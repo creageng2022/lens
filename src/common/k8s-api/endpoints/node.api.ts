@@ -168,7 +168,7 @@ export class Node extends KubeObject {
     }
 
     const roleLabels = Object.keys(this.metadata.labels)
-      .filter(key => key.includes("node-role.kubernetes.io"))
+      .filter(key => key.startsWith("node-role.kubernetes.io/"))
       .map(key => key.match(/([^/]+$)/)[0]); // all after last slash
 
     if (this.metadata.labels["kubernetes.io/role"] != undefined) {

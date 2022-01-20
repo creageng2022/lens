@@ -70,7 +70,7 @@ export class Router {
     this.addRoutes();
   }
 
-  public async route(cluster: Cluster, req: http.IncomingMessage, res: http.ServerResponse): Promise<boolean> {
+  public route = async (cluster: Cluster, req: http.IncomingMessage, res: http.ServerResponse): Promise<boolean> => {
     const url = new URL(req.url, "http://localhost");
     const path = url.pathname;
     const method = req.method.toLowerCase();
@@ -78,15 +78,11 @@ export class Router {
     const routeFound = !matchingRoute.isBoom;
 
     if (routeFound) {
-      const request = await this.getRequest({ req, res, cluster, url, params: matchingRoute.params });
-
-      await matchingRoute.route(request);
-
-      return true;
+      await matchingRoute.route(await this.getRequest({ req, res, cluster, url, params: matchingRoute.params }));
     }
 
-    return false;
-  }
+    return routeFound;
+  };
 
   protected async getRequest(opts: RouterRequestOpts): Promise<LensApiRequest> {
     const { req, res, url, cluster, params } = opts;

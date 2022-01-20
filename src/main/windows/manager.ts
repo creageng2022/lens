@@ -44,14 +44,6 @@ export class WindowManager {
   constructor(protected readonly dependencies: WindowManagerDependencies) {
     makeObservable(this);
     this.bindEvents();
-
-    // Start the app without showing the main window when auto starting on login
-    // (On Windows and Linux, we get a flag. On MacOS, we get special API.)
-    const startHidden = process.argv.includes("--hidden") || (isMac && app.getLoginItemSettings().wasOpenedAsHidden);
-
-    if (!startHidden) {
-      this.ensureMainWindow();
-    }
   }
 
   @computed get mainUrl() {
