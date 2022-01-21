@@ -15,11 +15,11 @@ import { observer } from "mobx-react";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import type { IComputedValue } from "mobx";
 import type { CatalogCategory } from "../../../common/catalog";
+import catalogCategoriesInjectable from "../../catalog/categories.injectable";
 
 export interface CatalogMenuProps {
   activeItem: string;
   onItemClick: (id: string) => void;
-  categories: IComputedValue<CatalogCategory[]>;
 }
 
 function getCategoryIcon(category: CatalogCategory) {
@@ -41,6 +41,7 @@ function Item(props: TreeItemProps) {
 }
 
 interface Dependencies {
+  categories: IComputedValue<CatalogCategory[]>;
 }
 
 const NonInjectedCatalogMenu = observer(({ categories, onItemClick, activeItem }: Dependencies & CatalogMenuProps) => (
@@ -85,6 +86,7 @@ const NonInjectedCatalogMenu = observer(({ categories, onItemClick, activeItem }
 
 export const CatalogMenu = withInjectables<Dependencies, CatalogMenuProps>(NonInjectedCatalogMenu, {
   getProps: (di, props) => ({
+    categories: di.inject(catalogCategoriesInjectable),
     ...props,
   }),
 });

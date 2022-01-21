@@ -182,7 +182,6 @@ const NonInjectedCatalog = observer(({
         <CatalogMenu
           activeItem={activeTab}
           onItemClick={onTabChange}
-          categories={categories}
         />
       )}
     >
