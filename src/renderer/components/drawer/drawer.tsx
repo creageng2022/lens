@@ -11,13 +11,14 @@ import { createPortal } from "react-dom";
 import { cssNames, disposer, Disposer, noop, StorageLayer } from "../../utils";
 import { Icon } from "../icon";
 import { Animate, AnimateName } from "../animate";
-import { history } from "../../navigation";
 import { ResizeDirection, ResizeGrowthDirection, ResizeSide, ResizingAnchor } from "../resizing-anchor";
 import drawerStorageInjectable, { defaultDrawerWidth, DrawerState } from "./storage.injectable";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import { observer } from "mobx-react";
 import windowAddEventListenerInjectable from "../../window/event-listener.injectable";
 import { observable } from "mobx";
+import historyInjectable from "../../navigation/history.injectable";
+import type { History } from "history";
 
 export type DrawerPosition = "top" | "left" | "right" | "bottom";
 
@@ -49,11 +50,13 @@ export interface DrawerProps {
 }
 
 interface Dependencies {
+  history: History;
   state: StorageLayer<DrawerState>;
   addWindowEventListener: <K extends keyof WindowEventMap>(type: K, listener: (this: Window, ev: WindowEventMap[K]) => any, options?: boolean | AddEventListenerOptions) => Disposer;
 }
 
 const NonInjectedDrawer = observer(({
+  history,
   state,
   addWindowEventListener,
   className,
@@ -211,6 +214,7 @@ const NonInjectedDrawer = observer(({
 
 export const Drawer = withInjectables<Dependencies, DrawerProps>(NonInjectedDrawer, {
   getProps: (di, props) => ({
+    history: di.inject(historyInjectable),
     state: di.inject(drawerStorageInjectable),
     addWindowEventListener: di.inject(windowAddEventListenerInjectable),
     ...props,

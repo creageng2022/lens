@@ -5,7 +5,6 @@
 
 import React, { useEffect } from "react";
 import { Route, Router, Switch } from "react-router";
-import { history } from "../../navigation";
 import { ClusterManager } from "../../components/cluster-manager";
 import { ErrorBoundary } from "../../components/error-boundary";
 import { Notifications } from "../../components/notifications";
@@ -14,8 +13,15 @@ import { CommandContainer } from "../../components/command-palette/command-conta
 import { ipcRenderer } from "electron";
 import { IpcRendererNavigationEvents } from "../../navigation/events";
 import { observer } from "mobx-react";
+import historyInjectable from "../../navigation/history.injectable";
+import { withInjectables } from "@ogre-tools/injectable-react";
+import type { History } from "history";
 
-export const RootFrame = observer(() => {
+interface Dependencies {
+  history: History
+}
+
+export const NonInjectedRootFrame = observer(({ history }: Dependencies) => {
   useEffect(() => {
     ipcRenderer.send(IpcRendererNavigationEvents.LOADED);
   }, []);
@@ -32,4 +38,10 @@ export const RootFrame = observer(() => {
       <CommandContainer />
     </Router>
   );
+});
+
+export const RootFrame = withInjectables<Dependencies>(NonInjectedRootFrame, {
+  getProps: (di) => ({
+    history: di.inject(historyInjectable),
+  }),
 });

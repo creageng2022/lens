@@ -3,11 +3,11 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import { ReleaseRollbackDialogModel } from "./release-rollback-dialog-model";
+import { history } from "./history";
 
-const releaseRollbackDialogModelInjectable = getInjectable({
-  instantiate: () => new ReleaseRollbackDialogModel(),
+const historyInjectable = getInjectable({
+  instantiate: () => history,
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default releaseRollbackDialogModelInjectable;
+export default historyInjectable;

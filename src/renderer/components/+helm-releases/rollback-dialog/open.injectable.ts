@@ -3,10 +3,10 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import type { HelmRelease } from "../../../common/k8s-api/endpoints";
-import { bind } from "../../utils";
-import type { HelmReleaseScaleDialogState } from "./rollback-dialog.state.injectable";
-import helmReleaseRollbackDialogStateInjectable from "./rollback-dialog.state.injectable";
+import type { HelmRelease } from "../../../../common/k8s-api/endpoints";
+import { bind } from "../../../utils";
+import type { HelmReleaseScaleDialogState } from "./state.injectable";
+import helmReleaseRollbackDialogStateInjectable from "./state.injectable";
 
 interface Dependencies {
   helmreleaseScaleDialogState: HelmReleaseScaleDialogState;

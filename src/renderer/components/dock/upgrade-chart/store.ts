@@ -4,11 +4,11 @@
  */
 
 import { action, autorun, computed, IReactionDisposer, makeObservable, reaction } from "mobx";
-import type { ReleaseStore } from "../../+helm-releases/store";
-import { getReleaseValues } from "../../../../common/k8s-api/endpoints/helm-release.api";
+import { getReleaseValues, HelmRelease } from "../../../../common/k8s-api/endpoints/helm-release.api";
 import { iter } from "../../../utils";
 import { DockTabStore, DockTabStoreDependencies } from "../dock-tab/store";
 import { DockStore, DockTabData, TabId, TabKind } from "../store";
+import type { IAsyncComputed } from "@ogre-tools/injectable-react";
 
 export interface IChartUpgradeData {
   releaseName: string;
@@ -16,8 +16,8 @@ export interface IChartUpgradeData {
 }
 
 export interface UpgradeChartStoreDependencies extends DockTabStoreDependencies<IChartUpgradeData> {
-  upgradeChartValues: DockTabStore<string>;
-  releaseStore: ReleaseStore;
+  releases: IAsyncComputed<HelmRelease[]>;
+  valuesStore: DockTabStore<string>;
   dockStore: DockStore;
 }
 
@@ -53,20 +53,20 @@ export class UpgradeChartStore extends DockTabStore<IChartUpgradeData> {
       return;
     }
     const dispose = reaction(() => {
-      const release = this.dependencies.releaseStore.getByName(releaseName);
+      const release = this.dependencies.releases.value.get().find(release => release.getName() === releaseName);
 
       return release?.getRevision(); // watch changes only by revision
     },
     release => {
       const releaseTab = this.getTabByRelease(releaseName);
 
-      if (!this.dependencies.releaseStore.isLoaded || !releaseTab) {
+      if (!releaseTab) {
         return;
       }
 
       // auto-reload values if was loaded before
       if (release) {
-        if (this.dependencies.dockStore.selectedTab === releaseTab && this.dependencies.upgradeChartValues.getData(releaseTab.id)) {
+        if (this.dependencies.dockStore.selectedTab === releaseTab && this.dependencies.valuesStore.getData(releaseTab.id)) {
           this.loadValues(releaseTab.id);
         }
       }
@@ -82,28 +82,27 @@ export class UpgradeChartStore extends DockTabStore<IChartUpgradeData> {
   }
 
   isLoading(tabId = this.dependencies.dockStore.selectedTabId) {
-    const values = this.dependencies.upgradeChartValues.getData(tabId);
+    const values = this.dependencies.valuesStore.getData(tabId);
 
-    return !this.dependencies.releaseStore.isLoaded || values === undefined;
+    return values === undefined;
   }
 
   @action
   async loadData(tabId: TabId) {
-    const values = this.dependencies.upgradeChartValues.getData(tabId);
+    const values = this.dependencies.valuesStore.getData(tabId);
 
     await Promise.all([
-      !this.dependencies.releaseStore.isLoaded && this.dependencies.releaseStore.loadFromContextNamespaces(),
       !values && this.loadValues(tabId),
     ]);
   }
 
   @action
   async loadValues(tabId: TabId) {
-    this.dependencies.upgradeChartValues.clearData(tabId); // reset
+    this.dependencies.valuesStore.clearData(tabId); // reset
     const { releaseName, releaseNamespace } = this.getData(tabId);
     const values = await getReleaseValues(releaseName, releaseNamespace, true);
 
-    this.dependencies.upgradeChartValues.setData(tabId, values);
+    this.dependencies.valuesStore.setData(tabId, values);
   }
 
   getTabByRelease(releaseName: string): DockTabData {

@@ -8,7 +8,7 @@ import hostedClusterInjectable from "../../common/cluster-store/hosted-cluster/h
 import namespacesInjectable from "../components/+namespaces/namespaces.injectable";
 import selectedNamespacesInjectable from "../components/+namespaces/selected-namespaces.injectable";
 
-const FrameContextInjectable = getInjectable({
+const frameContextInjectable = getInjectable({
   instantiate: (di) => new FrameContext({
     cluster: di.inject(hostedClusterInjectable),
     namespaces: di.inject(namespacesInjectable),
@@ -17,4 +17,4 @@ const FrameContextInjectable = getInjectable({
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default FrameContextInjectable;
+export default frameContextInjectable;

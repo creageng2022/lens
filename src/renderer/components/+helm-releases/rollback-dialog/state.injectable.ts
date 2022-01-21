@@ -4,7 +4,7 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { observable } from "mobx";
-import type { HelmRelease } from "../../../common/k8s-api/endpoints";
+import type { HelmRelease } from "../../../../common/k8s-api/endpoints";
 
 export interface HelmReleaseScaleDialogState {
   helmRelease: HelmRelease | null;

@@ -4,7 +4,7 @@
  */
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import releaseStoreInjectable from "../../+helm-releases/store.injectable";
+import releasesInjectable from "../../+helm-releases/releases.injectable";
 import dockStoreInjectable from "../store.injectable";
 import upgradeChartStorageInjectable from "./storage.injectable";
 import { UpgradeChartStore } from "./store";
@@ -12,10 +12,10 @@ import upgradeChartValuesInjectable from "./values.injectable";
 
 const upgradeChartStoreInjectable = getInjectable({
   instantiate: (di) => new UpgradeChartStore({
-    upgradeChartValues: di.inject(upgradeChartValuesInjectable),
-    releaseStore: di.inject(releaseStoreInjectable),
+    valuesStore: di.inject(upgradeChartValuesInjectable),
     storage: di.inject(upgradeChartStorageInjectable),
     dockStore: di.inject(dockStoreInjectable),
+    releases: di.inject(releasesInjectable),
   }),
   lifecycle: lifecycleEnum.singleton,
 });

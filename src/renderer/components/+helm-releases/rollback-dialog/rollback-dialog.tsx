@@ -7,17 +7,16 @@ import "./rollback-dialog.scss";
 
 import React, { useState } from "react";
 import { observer } from "mobx-react";
-import { Dialog, DialogProps } from "../dialog";
-import { Wizard, WizardStep } from "../wizard";
-import { getReleaseHistory, HelmRelease, IReleaseRevision } from "../../../common/k8s-api/endpoints/helm-release.api";
-import type { ReleaseStore } from "./store";
-import { Select, SelectOption } from "../select";
-import { Notifications } from "../notifications";
+import { Dialog, DialogProps } from "../../dialog";
+import { Wizard, WizardStep } from "../../wizard";
+import { getReleaseHistory, HelmRelease, IReleaseRevision } from "../../../../common/k8s-api/endpoints/helm-release.api";
+import { Select, SelectOption } from "../../select";
+import { Notifications } from "../../notifications";
 import orderBy from "lodash/orderBy";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import helmReleaseRollbackDialogStateInjectable from "./rollback-dialog.state.injectable";
-import closeHelmReleaseRollbackDialogInjectable from "./rollback-dialog-close.injectable";
-import releaseStoreInjectable from "./store.injectable";
+import helmReleaseRollbackDialogStateInjectable from "./state.injectable";
+import closeHelmReleaseRollbackDialogInjectable from "./close.injectable";
+import rollbackReleaseInjectable from "../rollback-release.injectable";
 
 export interface ReleaseRollbackDialogProps extends Omit<DialogProps, "isOpen"> {
 }
@@ -25,10 +24,10 @@ export interface ReleaseRollbackDialogProps extends Omit<DialogProps, "isOpen"> 
 interface Dependencies {
   helmRelease: HelmRelease | null;
   closeReleaseRollbackDialog: () => void;
-  releaseStore: ReleaseStore;
+  rollbackRelease: (releaseName: string, namespace: string, revisionNumber: number) => Promise<void>;
 }
 
-const NonInjectedReleaseRollbackDialog = observer(({ helmRelease, closeReleaseRollbackDialog, releaseStore, className, ...dialogProps }: Dependencies & ReleaseRollbackDialogProps) => {
+const NonInjectedReleaseRollbackDialog = observer(({ helmRelease, closeReleaseRollbackDialog, rollbackRelease, className, ...dialogProps }: Dependencies & ReleaseRollbackDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [revision, setRevision] = useState<IReleaseRevision | undefined>(undefined);
   const [revisions, setRevisions] = useState<IReleaseRevision[]>([]);
@@ -45,7 +44,7 @@ const NonInjectedReleaseRollbackDialog = observer(({ helmRelease, closeReleaseRo
   };
   const rollback = async () => {
     try {
-      await releaseStore.rollback(helmRelease.getName(), helmRelease.getNs(), helmRelease.getRevision());
+      await rollbackRelease(helmRelease.getName(), helmRelease.getNs(), helmRelease.getRevision());
       closeReleaseRollbackDialog();
     } catch (err) {
       Notifications.error(err);
@@ -96,7 +95,7 @@ export const ReleaseRollbackDialog = withInjectables<Dependencies, ReleaseRollba
   getProps: (di, props) => ({
     helmRelease: di.inject(helmReleaseRollbackDialogStateInjectable).helmRelease,
     closeReleaseRollbackDialog: di.inject(closeHelmReleaseRollbackDialogInjectable),
-    releaseStore: di.inject(releaseStoreInjectable),
+    rollbackRelease: di.inject(rollbackReleaseInjectable),
     ...props,
   }),
 });

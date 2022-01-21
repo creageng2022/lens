@@ -16,7 +16,6 @@ import type { IChartInstallData, InstallChartManager } from "./store";
 import { Spinner } from "../../spinner";
 import { Icon } from "../../icon";
 import { Button } from "../../button";
-import type { ReleaseStore } from "../../+helm-releases/store";
 import { LogsDialog } from "../../dialog/logs-dialog";
 import { Select, SelectOption } from "../../select";
 import { Input } from "../../input";
@@ -24,14 +23,14 @@ import { EditorPanel } from "../editor/editor-panel";
 import { navigate } from "../../../navigation";
 import { releaseURL } from "../../../../common/routes";
 import type { DockTabStorageLayer } from "../dock-tab/store";
-import type { IReleaseUpdateDetails } from "../../../../common/k8s-api/endpoints/helm-release.api";
+import type { IReleaseCreatePayload, IReleaseUpdateDetails } from "../../../../common/k8s-api/endpoints/helm-release.api";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import dockStoreInjectable from "../store.injectable";
 import installChartManagerInjectable from "./store.injectable";
 import chartVersionManagerInjectable from "./chart-version-manager.injectable";
 import releaseDetailsManagerInjectable from "./release-details-manager.injectable";
 import { Notifications } from "../../notifications";
-import releaseStoreInjectable from "../../+helm-releases/store.injectable";
+import createReleaseInjectable from "../../+helm-releases/create-release.injectable";
 
 export interface InstallChartProps {
   tab: DockTabData;
@@ -46,10 +45,10 @@ interface Dependencies {
   installChartManager: InstallChartManager;
   chartVersionManager: DockTabStorageLayer<string[]>;
   releaseDetailsManager: DockTabStorageLayer<IReleaseUpdateDetails>;
-  releaseStore: ReleaseStore;
+  createRelease: (payload: IReleaseCreatePayload) => Promise<IReleaseUpdateDetails>
 }
 
-const NonInjectedInstallChart = observer(({ releaseStore, tab, dockManager, installChartManager, chartVersionManager, releaseDetailsManager }: Dependencies & InstallChartProps) => {
+const NonInjectedInstallChart = observer(({ createRelease, tab, dockManager, installChartManager, chartVersionManager, releaseDetailsManager }: Dependencies & InstallChartProps) => {
   const [error, setError] = useState("");
   const [showNotes, setShowNotes] = useState(false);
   const chartData = installChartManager.getData(tab.id);
@@ -99,7 +98,7 @@ const NonInjectedInstallChart = observer(({ releaseStore, tab, dockManager, inst
 
   const install = async () => {
     const { repo, name, version, namespace, values, releaseName } = chartData;
-    const details = await releaseStore.create({
+    const details = await createRelease({
       name: releaseName || undefined,
       chart: name,
       repo, namespace, version, values,
@@ -206,7 +205,7 @@ export const InstallChart = withInjectables<Dependencies, InstallChartProps>(Non
     installChartManager: di.inject(installChartManagerInjectable),
     chartVersionManager: di.inject(chartVersionManagerInjectable),
     releaseDetailsManager: di.inject(releaseDetailsManagerInjectable),
-    releaseStore: di.inject(releaseStoreInjectable),
+    createRelease: di.inject(createReleaseInjectable),
     ...props,
   }),
 });

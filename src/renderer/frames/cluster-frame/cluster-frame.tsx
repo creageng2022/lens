@@ -6,9 +6,7 @@ import React from "react";
 import { observable, makeObservable } from "mobx";
 import { disposeOnUnmount, observer } from "mobx-react";
 import { Redirect, Route, Router, Switch } from "react-router";
-import { history } from "../../navigation";
 import { UserManagementLayout } from "../../components/+user-management/layout";
-import { ConfirmDialog } from "../../components/confirm-dialog";
 import { ClusterOverview } from "../../components/+cluster/overview";
 import { Events } from "../../components/+events/events";
 import { ClusterPageRegistry, getExtensionPageUrl } from "../../../extensions/registries/page-registry";
@@ -49,8 +47,11 @@ import { StorageLayout } from "../../components/+storage/layout";
 import { CustomResourcesLayout } from "../../components/+custom-resource/layout";
 import { HelmAppsLayout } from "../../components/+helm-apps/layout";
 import { Dock } from "../../components/dock/dock";
-
+import historyInjectable from "../../navigation/history.injectable";
+import type { History } from "history";
+import { ConfirmDialog } from "../../components/confirm-dialog";
 interface Dependencies {
+  history: History;
   namespaceStore: NamespaceStore;
   hostedClusterId: ClusterId;
   subscribeStores: (stores: KubeObjectStore<KubeObject>[]) => Disposer;
@@ -135,10 +136,11 @@ class NonInjectedClusterFrame extends React.Component<Dependencies> {
 
   render() {
     return (
-      <Router history={history}>
+      <Router history={this.props.history}>
         <ErrorBoundary>
           <MainLayout sidebar={<Sidebar />} footer={<Dock />}>
             <Switch>
+
               <Route component={ClusterOverview} {...routes.clusterRoute}/>
               <Route component={Nodes} {...routes.nodesRoute}/>
               <Route component={WorkloadsLayout} {...routes.workloadsRoute}/>
@@ -181,6 +183,7 @@ class NonInjectedClusterFrame extends React.Component<Dependencies> {
 
 export const ClusterFrame = withInjectables<Dependencies>(NonInjectedClusterFrame, {
   getProps: di => ({
+    history: di.inject(historyInjectable),
     namespaceStore: di.inject(namespaceStoreInjectable),
     hostedClusterId: di.inject(hostedClusterInjectable).id,
     subscribeStores: di.inject(kubeWatchApiInjectable).subscribeStores,

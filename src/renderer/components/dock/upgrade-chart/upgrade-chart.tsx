@@ -12,18 +12,18 @@ import { cssNames } from "../../../utils";
 import type { DockTabData } from "../store";
 import { InfoPanel } from "../info-panel/info-panel";
 import { Spinner } from "../../spinner";
-import type { ReleaseStore } from "../../+helm-releases/store";
 import { Badge } from "../../badge";
 import { EditorPanel } from "../editor/editor-panel";
 import { helmChartStore, IChartVersion } from "../../+helm-charts/helm-chart.store";
-import type { HelmRelease } from "../../../../common/k8s-api/endpoints/helm-release.api";
+import type { HelmRelease, IReleaseUpdateDetails, IReleaseUpdatePayload } from "../../../../common/k8s-api/endpoints/helm-release.api";
 import { Select, SelectOption } from "../../select";
 import type { UpgradeChartStore } from "./store";
-import { withInjectables } from "@ogre-tools/injectable-react";
+import { IAsyncComputed, withInjectables } from "@ogre-tools/injectable-react";
 import upgradeChartStoreInjectable from "./store.injectable";
 import type { DockTabStore } from "../dock-tab/store";
 import upgradeChartValuesInjectable from "./values.injectable";
-import releaseStoreInjectable from "../../+helm-releases/store.injectable";
+import releasesInjectable from "../../+helm-releases/releases.injectable";
+import updateReleaseInjectable from "../../+helm-releases/update-release.injectable";
 
 export interface UpgradeChartProps {
   className?: string;
@@ -33,10 +33,11 @@ export interface UpgradeChartProps {
 interface Dependencies {
   upgradeChartStore: UpgradeChartStore;
   upgradeChartValues: DockTabStore<string>;
-  releaseStore: ReleaseStore;
+  releases: IAsyncComputed<HelmRelease[]>;
+  updateRelease: (name: string, namespace: string, payload: IReleaseUpdatePayload) => Promise<IReleaseUpdateDetails>;
 }
 
-const NonInjectedUpgradeChart = observer(({ releaseStore, upgradeChartStore, tab, className, upgradeChartValues }: Dependencies & UpgradeChartProps) => {
+const NonInjectedUpgradeChart = observer(({ releases, updateRelease, upgradeChartStore, tab, className, upgradeChartValues }: Dependencies & UpgradeChartProps) => {
   const [error, setError] = useState("");
   const [versions] = useState(observable.array<IChartVersion>());
   const [version, setVersion] = useState<IChartVersion | undefined>();
@@ -48,7 +49,7 @@ const NonInjectedUpgradeChart = observer(({ releaseStore, upgradeChartStore, tab
       return null;
     }
 
-    return releaseStore.getByName(tabData.releaseName);
+    return releases.value.get().find(release => release.getName() === tabData.releaseName);
   });
   const loadVersions = async (release: null | HelmRelease) => {
     if (!release) {
@@ -94,7 +95,7 @@ const NonInjectedUpgradeChart = observer(({ releaseStore, upgradeChartStore, tab
       return null;
     }
 
-    await releaseStore.update(releaseName, releaseNs, {
+    await updateRelease(releaseName, releaseNs, {
       chart: release.getChart(),
       values: value,
       repo: version.repo,
@@ -157,7 +158,8 @@ export const UpgradeChart = withInjectables<Dependencies, UpgradeChartProps>(Non
   getProps: (di, props) => ({
     upgradeChartStore: di.inject(upgradeChartStoreInjectable),
     upgradeChartValues: di.inject(upgradeChartValuesInjectable),
-    releaseStore: di.inject(releaseStoreInjectable),
+    releases: di.inject(releasesInjectable),
+    updateRelease: di.inject(updateReleaseInjectable),
     ...props,
   }),
 });
