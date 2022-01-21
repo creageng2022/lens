@@ -8,7 +8,7 @@ import { autorun, computed, observable, makeObservable } from "mobx";
 import { IPodLogsQuery, Pod } from "../../../../common/k8s-api/endpoints";
 import { autoBind, interval } from "../../../utils";
 import { DockStore, TabId, TabKind } from "../dock-store/dock.store";
-import type { LogTabStore } from "../log-tab-store/log-tab.store";
+import type { LogTabStore } from "./tab.store";
 
 type PodLogLine = string;
 
@@ -65,9 +65,7 @@ export class LogStore {
    * Also, it handles loading errors, rewriting whole logs with error
    * messages
    */
-  load = async () => {
-    const tabId = this.dependencies.dockStore.selectedTabId;
-
+  load = async (tabId: TabId) => {
     try {
       const logs = await this.loadLogs(tabId, {
         tailLines: this.lines + logLinesToLoad,
@@ -138,6 +136,17 @@ export class LogStore {
     return this.logs.length;
   }
 
+  public getLogsByTabId(tabId: TabId): string[] {
+    return this.podLogs.get(tabId) ?? [];
+  }
+
+  public getLogsWithoutTimestampsByTabId(tabId: TabId): string[] {
+    return this.getLogsByTabId(tabId).map(this.removeTimestamps);
+  }
+
+  public getTimestampSplitLogsByTabId(tabId: TabId): [string, string][] {
+    return this.getLogsByTabId(tabId).map(this.splitOutTimestamp);
+  }
 
   /**
    * Returns logs with timestamps for selected tab
@@ -171,7 +180,7 @@ export class LogStore {
     return stamp.toISOString();
   }
 
-  splitOutTimestamp(logs: string): [string, string] {
+  splitOutTimestamp = (logs: string): [string, string] => {
     const extraction = /^(\d+\S+)(.*)/m.exec(logs);
 
     if (!extraction || extraction.length < 3) {
@@ -179,23 +188,23 @@ export class LogStore {
     }
 
     return [extraction[1], extraction[2]];
-  }
+  };
 
   getTimestamps(logs: string) {
     return logs.match(/^\d+\S+/gm);
   }
 
-  removeTimestamps(logs: string) {
+  removeTimestamps = (logs: string) => {
     return logs.replace(/^\d+.*?\s/gm, "");
-  }
+  };
 
   clearLogs(tabId: TabId) {
     this.podLogs.delete(tabId);
   }
 
-  reload = async () => {
-    this.clearLogs(this.dependencies.dockStore.selectedTabId);
+  reload = (tabId: TabId) => {
+    this.clearLogs(tabId);
 
-    await this.load();
+    return this.load(tabId);
   };
 }
