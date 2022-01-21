@@ -12,11 +12,11 @@ import type { MonacoTheme } from "./monaco-themes";
 import { MonacoValidator, monacoValidators } from "./monaco-validators";
 import { debounce, merge } from "lodash";
 import { cssNames, disposer } from "../../utils";
-import type { UserStore } from "../../../common/user-store";
+import type { UserPreferencesStore } from "../../../common/user-preferences";
 import type { Theme } from "../../themes/store";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import activeThemeInjectable from "../../themes/active-theme.injectable";
-import userStoreInjectable from "../../../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../../../common/user-preferences/store.injectable";
 import type { LensLogger } from "../../../common/logger";
 
 export type MonacoEditorId = string;
@@ -39,7 +39,7 @@ export interface MonacoEditorProps {
 }
 interface Dependencies {
   readonly activeTheme: IComputedValue<Theme>;
-  readonly userStore: UserStore;
+  readonly userStore: UserPreferencesStore;
   readonly logger: LensLogger;
 }
 
@@ -267,7 +267,7 @@ const NonInjectedMonacoEditor = observer(forwardRef<MonacoEditorRef, Dependencie
 export const MonacoEditor = withInjectables<Dependencies, MonacoEditorProps>(NonInjectedMonacoEditor, {
   getProps: (di, props) => ({
     activeTheme: di.inject(activeThemeInjectable),
-    userStore: di.inject(userStoreInjectable),
+    userStore: di.inject(userPreferencesStoreInjectable),
     logger: {
       ...console,
       silly: console.debug,

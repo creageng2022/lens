@@ -4,7 +4,7 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import directoryForKubeConfigsInjectable from "../../../common/app-paths/directory-for-kube-configs.injectable";
-import kubeconfigSyncEntriesInjectable from "../../../common/user-store/kubeconfig-sync-entries.injectable";
+import kubeconfigSyncEntriesInjectable from "../../../common/user-preferences/kubeconfig-sync-entries.injectable";
 import addComputedEntitySourceInjectable from "../../catalog/add-computed-entity-source.injectable";
 import kubeconfigSyncLoggerInjectable from "./logger.injectable";
 import { KubeconfigSyncManager } from "./manager";

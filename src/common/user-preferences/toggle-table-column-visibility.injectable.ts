@@ -3,10 +3,10 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import userStoreInjectable from "./store.injectable";
+import userPreferencesStoreInjectable from "./store.injectable";
 
 const toggleTableColumnVisibilityInjectable = getInjectable({
-  instantiate: (di) => di.inject(userStoreInjectable).toggleTableColumnVisibility,
+  instantiate: (di) => di.inject(userPreferencesStoreInjectable).toggleTableColumnVisibility,
   lifecycle: lifecycleEnum.singleton,
 });
 

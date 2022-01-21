@@ -4,6 +4,6 @@
  */
 import { getInjectionToken } from "@ogre-tools/injectable";
 import type { Migrations } from "conf/dist/source/types";
-import type { UserStoreModel } from "./store";
+import type { UserPreferencesStoreModel } from "./store";
 
-export const userStoreMigrationsInjectionToken = getInjectionToken<Migrations<UserStoreModel> | undefined>();
+export const userPreferencesStoreMigrationsInjectionToken = getInjectionToken<Migrations<UserPreferencesStoreModel> | undefined>();

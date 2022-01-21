@@ -11,21 +11,21 @@ import { getAppVersion } from "../utils/app-version";
 import { kubeConfigDefaultPath } from "../kube-helpers";
 import { appEventBus } from "../app-event-bus/event-bus";
 import { ObservableToggleSet, toJS } from "../../renderer/utils";
-import { DESCRIPTORS, EditorConfiguration, ExtensionRegistry, KubeconfigSyncValue, UserPreferencesModel } from "./preferences-helpers";
+import { DESCRIPTORS, EditorConfiguration, ExtensionRegistry, KubeconfigSyncValue, UserPreferencesModel, TerminalConfig } from "./preferences-helpers";
 import logger from "../../main/logger";
 import type { Migrations } from "conf/dist/source/types";
 
-export interface UserStoreModel {
+export interface UserPreferencesStoreModel {
   lastSeenAppVersion: string;
   preferences: UserPreferencesModel;
 }
 
 interface UserStoreDependencies {
-  migrations: Migrations<UserStoreModel> | undefined;
+  migrations: Migrations<UserPreferencesStoreModel> | undefined;
   fileNameMigration: () => void;
 }
 
-export class UserStore extends BaseStore<UserStoreModel> /* implements UserStoreFlatModel (when strict null is enabled) */ {
+export class UserPreferencesStore extends BaseStore<UserPreferencesStoreModel> /* implements UserStoreFlatModel (when strict null is enabled) */ {
   readonly displayName = "UserStore";
   constructor({ migrations, fileNameMigration }: UserStoreDependencies) {
     super({
@@ -58,6 +58,7 @@ export class UserStore extends BaseStore<UserStoreModel> /* implements UserStore
   @observable downloadBinariesPath?: string;
   @observable kubectlBinariesPath?: string;
   @observable terminalCopyOnSelect: boolean;
+  @observable terminalConfig: TerminalConfig;
   @observable updateChannel?: string;
   @observable extensionRegistryUrl: ExtensionRegistry;
 
@@ -160,7 +161,7 @@ export class UserStore extends BaseStore<UserStoreModel> /* implements UserStore
   }
 
   @action
-  protected fromStore({ lastSeenAppVersion, preferences }: Partial<UserStoreModel> = {}) {
+  protected fromStore({ lastSeenAppVersion, preferences }: Partial<UserPreferencesStoreModel> = {}) {
     logger.debug("UserStore.fromStore()", { lastSeenAppVersion, preferences });
 
     if (lastSeenAppVersion) {
@@ -184,12 +185,13 @@ export class UserStore extends BaseStore<UserStoreModel> /* implements UserStore
     this.syncKubeconfigEntries.replace(DESCRIPTORS.syncKubeconfigEntries.fromStore(preferences?.syncKubeconfigEntries));
     this.editorConfiguration = DESCRIPTORS.editorConfiguration.fromStore(preferences?.editorConfiguration);
     this.terminalCopyOnSelect = DESCRIPTORS.terminalCopyOnSelect.fromStore(preferences?.terminalCopyOnSelect);
+    this.terminalConfig = DESCRIPTORS.terminalConfig.fromStore(preferences?.terminalConfig);
     this.updateChannel = DESCRIPTORS.updateChannel.fromStore(preferences?.updateChannel);
     this.extensionRegistryUrl = DESCRIPTORS.extensionRegistryUrl.fromStore(preferences?.extensionRegistryUrl);
   }
 
-  toJSON(): UserStoreModel {
-    const model: UserStoreModel = {
+  toJSON(): UserPreferencesStoreModel {
+    const model: UserPreferencesStoreModel = {
       lastSeenAppVersion: this.lastSeenAppVersion,
       preferences: {
         httpsProxy: DESCRIPTORS.httpsProxy.toStore(this.httpsProxy),
@@ -209,6 +211,7 @@ export class UserStore extends BaseStore<UserStoreModel> /* implements UserStore
         syncKubeconfigEntries: DESCRIPTORS.syncKubeconfigEntries.toStore(this.syncKubeconfigEntries),
         editorConfiguration: DESCRIPTORS.editorConfiguration.toStore(this.editorConfiguration),
         terminalCopyOnSelect: DESCRIPTORS.terminalCopyOnSelect.toStore(this.terminalCopyOnSelect),
+        terminalConfig: DESCRIPTORS.terminalConfig.toStore(this.terminalConfig),
         updateChannel: DESCRIPTORS.updateChannel.toStore(this.updateChannel),
         extensionRegistryUrl: DESCRIPTORS.extensionRegistryUrl.toStore(this.extensionRegistryUrl),
       },

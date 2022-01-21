@@ -7,15 +7,15 @@ import { joinMigrations } from "../helpers";
 import version500Alpha3 from "./5.0.0-alpha.3";
 import version503Beta1Injecable from "./5.0.3-beta.1.injectable.ts";
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import { userStoreMigrationsInjectionToken } from "../../../common/user-store/migrations-injection-token";
+import { userPreferencesStoreMigrationsInjectionToken } from "../../../common/user-preferences/migrations-injection-token";
 
-const userStoreMigrationsInjectable = getInjectable({
+const userPreferencesStoreMigrationsInjectable = getInjectable({
   instantiate: (di) => joinMigrations(
     version500Alpha3,
     di.inject(version503Beta1Injecable),
   ),
-  injectionToken: userStoreMigrationsInjectionToken,
+  injectionToken: userPreferencesStoreMigrationsInjectionToken,
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default userStoreMigrationsInjectable;
+export default userPreferencesStoreMigrationsInjectable;

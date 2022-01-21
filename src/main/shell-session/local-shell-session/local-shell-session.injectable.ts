@@ -7,9 +7,9 @@ import { LocalShellSession, LocalShellSessionDependencies } from "./local-shell-
 import type { Cluster } from "../../../common/cluster/cluster";
 import type WebSocket from "ws";
 import createKubectlInjectable from "../../kubectl/create-kubectl.injectable";
-import downloadKubectlBinariesInjectable from "../../../common/user-store/download-kubectl-binaries.injectable";
-import resolvedShellInjectable from "../../../common/user-store/resolved-shell-injectable";
-import kubectlBinariesPathInjectable from "../../../common/user-store/kubectl-binaries-path.injectable";
+import downloadKubectlBinariesInjectable from "../../../common/user-preferences/download-kubectl-binaries.injectable";
+import resolvedShellInjectable from "../../../common/user-preferences/resolved-shell-injectable";
+import kubectlBinariesPathInjectable from "../../../common/user-preferences/kubectl-binaries-path.injectable";
 
 interface InstantiationParameter {
   webSocket: WebSocket;

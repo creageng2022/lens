@@ -8,12 +8,11 @@ import { observer } from "mobx-react";
 import { SubTitle } from "../layout/sub-title";
 import { Select, SelectOption } from "../select";
 import type { ThemeStore } from "../../themes/store";
-import type { UserStore } from "../../../common/user-store";
+import type { UserPreferencesStore } from "../../../common/user-preferences";
 import { Input } from "../input";
-import { isWindows } from "../../../common/vars";
 import { Switch } from "../switch";
 import moment from "moment-timezone";
-import { CONSTANTS, defaultExtensionRegistryUrl, ExtensionRegistryLocation } from "../../../common/user-store/preferences-helpers";
+import { CONSTANTS, defaultExtensionRegistryUrl, ExtensionRegistryLocation } from "../../../common/user-preferences/preferences-helpers";
 import { action, IComputedValue } from "mobx";
 import { isUrl } from "../input/input_validators";
 import { ExtensionSettings } from "./extension-settings";
@@ -21,7 +20,7 @@ import type { RegisteredAppPreference } from "./app-preferences/app-preference-r
 import { withInjectables } from "@ogre-tools/injectable-react";
 import appPreferencesInjectable from "./app-preferences/app-preferences.injectable";
 import themeStoreInjectable from "../../themes/store.injectable";
-import userStoreInjectable from "../../../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../../../common/user-preferences/store.injectable";
 
 const timezoneOptions: SelectOption<string>[] = moment.tz.names().map(zone => ({
   label: zone,
@@ -36,21 +35,12 @@ export interface ApplicationProps {}
 
 interface Dependencies {
   appPreferenceItems: IComputedValue<RegisteredAppPreference[]>;
-  userStore: UserStore;
+  userStore: UserPreferencesStore;
   themeStore: ThemeStore;
 }
 
 const NonInjectedApplication = observer(({ appPreferenceItems, themeStore, userStore }: Dependencies & ApplicationProps) => {
-  const defaultShell = process.env.SHELL
-    || process.env.PTYSHELL
-    || (
-      isWindows
-        ? "powershell.exe"
-        : "System default shell"
-    );
-
   const [customUrl, setCustomUrl] = React.useState(userStore.extensionRegistryUrl.customUrl || "");
-  const [shell, setShell] = React.useState(userStore.shell || "");
   const extensionSettings = appPreferenceItems.get().filter((preference) => preference.showInPreferencesTab === "application");
 
   return (
@@ -66,43 +56,7 @@ const NonInjectedApplication = observer(({ appPreferenceItems, themeStore, userS
         />
       </section>
 
-      <hr />
-
-      <section id="terminalTheme">
-        <SubTitle title="Terminal theme" />
-        <Select
-          themeName="lens"
-          options={[
-            { label: "Match theme", value: "" },
-            ...themeStore.themeOptions,
-          ]}
-          value={userStore.terminalTheme}
-          onChange={({ value }) => userStore.terminalTheme = value}
-        />
-      </section>
-
-      <section id="shell">
-        <SubTitle title="Terminal Shell Path" />
-        <Input
-          theme="round-black"
-          placeholder={defaultShell}
-          value={shell}
-          onChange={setShell}
-          onBlur={() => userStore.shell = shell}
-        />
-      </section>
-
-      <section id="terminalSelection">
-        <SubTitle title="Terminal copy & paste" />
-        <Switch
-          checked={userStore.terminalCopyOnSelect}
-          onChange={() => userStore.terminalCopyOnSelect = !userStore.terminalCopyOnSelect}
-        >
-          Copy on select and paste on right-click
-        </Switch>
-      </section>
-
-      <hr />
+      <hr/>
 
       <section id="extensionRegistryUrl">
         <SubTitle title="Extension Install Registry" />
@@ -179,6 +133,6 @@ export const Application = withInjectables<Dependencies, ApplicationProps>(NonIn
   getProps: (di) => ({
     appPreferenceItems: di.inject(appPreferencesInjectable),
     themeStore: di.inject(themeStoreInjectable),
-    userStore: di.inject(userStoreInjectable),
+    userStore: di.inject(userPreferencesStoreInjectable),
   }),
 });

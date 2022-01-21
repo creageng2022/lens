@@ -5,14 +5,14 @@
 
 import { autoUpdater } from "electron-updater";
 import { broadcastMessage, AutoUpdateChecking, AutoUpdateLogPrefix } from "../../common/ipc";
-import type { UserStore } from "../../common/user-store";
+import type { UserPreferencesStore } from "../../common/user-preferences";
 import logger from "../logger";
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { bind } from "../../common/utils";
-import userStoreInjectable from "../../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../../common/user-preferences/store.injectable";
 
 interface Dependencies {
-  userStore: UserStore;
+  userStore: UserPreferencesStore;
 }
 
 async function checkForUpdates({ userStore }: Dependencies): Promise<void> {
@@ -30,7 +30,7 @@ async function checkForUpdates({ userStore }: Dependencies): Promise<void> {
 
 const checkForUpdatesInjectable = getInjectable({
   instantiate: (di) => bind(checkForUpdates, null, {
-    userStore: di.inject(userStoreInjectable),
+    userStore: di.inject(userPreferencesStoreInjectable),
   }),
   lifecycle: lifecycleEnum.singleton,
 });

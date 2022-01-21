@@ -11,7 +11,7 @@ import { areArgsUpdateAvailableToBackchannel, AutoUpdateLogPrefix, AutoUpdateNoU
 import { once } from "lodash";
 import { ipcMain, autoUpdater as electronAutoUpdater } from "electron";
 import { nextUpdateChannel } from "../utils/update-channel";
-import type { UserStore } from "../../common/user-store/store";
+import type { UserPreferencesStore } from "../../common/user-preferences/store";
 
 let installVersion: null | string = null;
 
@@ -59,7 +59,7 @@ autoUpdater.logger = {
 };
 
 interface Dependencies {
-  userStore: UserStore;
+  userStore: UserPreferencesStore;
   checkForUpdates: () => Promise<void>;
 }
 
@@ -144,12 +144,12 @@ const startUpdateChecking = once(function ({ userStore, checkForUpdates }: Depen
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import checkForUpdatesInjectable from "./check-for-updates.injectable";
-import userStoreInjectable from "../../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../../common/user-preferences/store.injectable";
 
 const startUpdateCheckingInjectable = getInjectable({
   instantiate: (di) => bind(startUpdateChecking, null, {
     checkForUpdates: di.inject(checkForUpdatesInjectable),
-    userStore: di.inject(userStoreInjectable),
+    userStore: di.inject(userPreferencesStoreInjectable),
   }),
   lifecycle: lifecycleEnum.singleton,
 });

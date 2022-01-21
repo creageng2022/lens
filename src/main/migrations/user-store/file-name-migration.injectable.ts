@@ -8,7 +8,7 @@ import path from "path";
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { bind } from "../../../common/utils";
 import directoryForUserDataInjectable from "../../../common/app-paths/directory-for-user-data.injectable";
-import { userStoreFileNameMigrationInjectionToken } from "../../../common/user-store/file-name-migration-injection-token";
+import { userStoreFileNameMigrationInjectionToken } from "../../../common/user-preferences/file-name-migration-injection-token";
 
 interface Dependencies {
   userDataPath: string;

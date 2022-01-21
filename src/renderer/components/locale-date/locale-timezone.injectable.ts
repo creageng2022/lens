@@ -4,11 +4,11 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { computed } from "mobx";
-import userStoreInjectable from "../../../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../../../common/user-preferences/store.injectable";
 
 const localeTimezoneInjectable = getInjectable({
   instantiate: (di) => {
-    const userStore = di.inject(userStoreInjectable);
+    const userStore = di.inject(userPreferencesStoreInjectable);
 
     return computed(() => userStore.localeTimezone);
   },

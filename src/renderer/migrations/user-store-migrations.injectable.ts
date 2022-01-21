@@ -3,12 +3,12 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import { userStoreMigrationsInjectionToken } from "../../common/user-store/migrations-injection-token";
+import { userPreferencesStoreMigrationsInjectionToken } from "../../common/user-preferences/migrations-injection-token";
 
-const userStoreFileNameMigrationInjectable = getInjectable({
+const userPreferencesStoreFileNameMigrationInjectable = getInjectable({
   instantiate: () => undefined,
-  injectionToken: userStoreMigrationsInjectionToken,
+  injectionToken: userPreferencesStoreMigrationsInjectionToken,
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default userStoreFileNameMigrationInjectable;
+export default userPreferencesStoreFileNameMigrationInjectable;

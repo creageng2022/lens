@@ -4,16 +4,16 @@
  */
 
 import requestPromise from "request-promise-native";
-import type { UserStore } from "./user-store";
+import type { UserPreferencesStore } from "./user-preferences";
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { bind } from "./utils";
-import userStoreInjectable from "./user-store/store.injectable";
+import userPreferencesStoreInjectable from "./user-preferences/store.injectable";
 
 // todo: get rid of "request" (deprecated)
 // https://github.com/lensapp/lens/issues/459
 
 interface Dependencies {
-  userStore: UserStore;
+  userStore: UserPreferencesStore;
 }
 
 function customRequestPromise({ userStore }: Dependencies, opts: requestPromise.Options) {
@@ -31,7 +31,7 @@ function customRequestPromise({ userStore }: Dependencies, opts: requestPromise.
  */
 const customRequestPromiseInjectable = getInjectable({
   instantiate: (di) => bind(customRequestPromise, null, {
-    userStore: di.inject(userStoreInjectable),
+    userStore: di.inject(userPreferencesStoreInjectable),
   }),
   lifecycle: lifecycleEnum.singleton,
 });

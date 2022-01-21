@@ -9,12 +9,12 @@ import { SemVer } from "semver";
 import electron from "electron";
 import { stdout, stderr } from "process";
 import { getDisForUnitTesting } from "../../test-utils/get-dis-for-unit-testing";
-import userStoreInjectable from "../user-store/store.injectable";
+import userPreferencesStoreInjectable from "../user-preferences/store.injectable";
 import type { DependencyInjectionContainer } from "@ogre-tools/injectable";
 import directoryForUserDataInjectable from "../app-paths/directory-for-user-data.injectable";
 import type { ClusterStoreModel } from "../cluster-store/store";
 import { defaultTheme } from "../vars";
-import type { UserStore } from "../user-store";
+import type { UserPreferencesStore } from "../user-preferences";
 
 jest.mock("electron", () => ({
   app: {
@@ -35,7 +35,7 @@ jest.mock("electron", () => ({
 console = new Console(stdout, stderr);
 
 describe("user store tests", () => {
-  let userStore: UserStore;
+  let userStore: UserPreferencesStore;
   let mainDi: DependencyInjectionContainer;
 
   beforeEach(async () => {
@@ -58,7 +58,7 @@ describe("user store tests", () => {
     beforeEach(() => {
       mockFs({ "some-directory-for-user-data": { "config.json": "{}", "kube_config": "{}" }});
 
-      userStore = mainDi.inject(userStoreInjectable);
+      userStore = mainDi.inject(userPreferencesStoreInjectable);
     });
 
     afterEach(() => {
@@ -124,7 +124,7 @@ describe("user store tests", () => {
         },
       });
 
-      userStore = mainDi.inject(userStoreInjectable);
+      userStore = mainDi.inject(userPreferencesStoreInjectable);
     });
 
     afterEach(() => {

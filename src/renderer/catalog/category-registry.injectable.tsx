@@ -20,7 +20,7 @@ import { Notifications } from "../components/notifications";
 import { PathPicker } from "../components/path-picker";
 import { multiSet } from "../utils";
 import removeWeblinkByIdInjectable from "../../common/weblinks/remove-by-id.injectable";
-import userStoreInjectable from "../../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../../common/user-preferences/store.injectable";
 import getClusterByIdInjectable from "../../common/cluster-store/get-cluster-by-id.injectable";
 import openDeleteClusterDialogInjectable from "../components/delete-cluster-dialog/open-delete-cluster-dialog.injectable";
 
@@ -28,7 +28,7 @@ const catalogCategoryRegistryInjectable = getInjectable({
   instantiate: (di) => {
     const openCommandOverlay = di.inject(openCommandDialogInjectable);
     const removeWeblinkById = di.inject(removeWeblinkByIdInjectable);
-    const userStore = di.inject(userStoreInjectable);
+    const userStore = di.inject(userPreferencesStoreInjectable);
     const getClusterById = di.inject(getClusterByIdInjectable);
     const openDeleteClusterDialog = di.inject(openDeleteClusterDialogInjectable);
 

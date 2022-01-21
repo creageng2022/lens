@@ -4,15 +4,15 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { computed } from "mobx";
-import userStoreInjectable from "./store.injectable";
+import userPreferencesStoreInjectable from "./store.injectable";
 
-const allowErrorReportingInjectable = getInjectable({
+const kubectlBinariesPathInjectable = getInjectable({
   instantiate: (di) => {
-    const userStore = di.inject(userStoreInjectable);
+    const userStore = di.inject(userPreferencesStoreInjectable);
 
-    return computed(() => userStore.allowErrorReporting);
+    return computed(() => userStore.kubectlBinariesPath);
   },
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default allowErrorReportingInjectable;
+export default kubectlBinariesPathInjectable;

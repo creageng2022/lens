@@ -4,14 +4,14 @@
  */
 import { observer } from "mobx-react";
 import React from "react";
-import type { UserStore } from "../../../common/user-store";
+import type { UserPreferencesStore } from "../../../common/user-preferences";
 import { Switch } from "../switch";
 import { Select } from "../select";
 import { SubTitle } from "../layout/sub-title";
 import { SubHeader } from "../layout/sub-header";
 import { Input, InputValidators } from "../input";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import userStoreInjectable from "../../../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../../../common/user-preferences/store.injectable";
 
 enum EditorLineNumbersStyles {
   on = "On",
@@ -23,7 +23,7 @@ enum EditorLineNumbersStyles {
 export interface EditorProps {}
 
 interface Dependencies {
-  userStore: UserStore;
+  userStore: UserPreferencesStore;
 }
 
 const NonInjectedEditor = observer(({ userStore }: Dependencies & EditorProps) => {
@@ -77,13 +77,34 @@ const NonInjectedEditor = observer(({ userStore }: Dependencies & EditorProps) =
           onChange={value => editorConfiguration.tabSize = Number(value)}
         />
       </section>
+      <section>
+        <SubTitle title="Font size"/>
+        <Input
+          theme="round-black"
+          type="number"
+          min={10}
+          validators={InputValidators.isNumber}
+          value={editorConfiguration.fontSize.toString()}
+          onChange={value => editorConfiguration.fontSize = Number(value)}
+        />
+      </section>
+      <section>
+        <SubTitle title="Font family"/>
+        <Input
+          theme="round-black"
+          type="text"
+          validators={InputValidators.isNumber}
+          value={editorConfiguration.fontFamily}
+          onChange={value => editorConfiguration.fontFamily = value}
+        />
+      </section>
     </section>
   );
 });
 
 export const Editor = withInjectables<Dependencies, EditorProps>(NonInjectedEditor, {
   getProps: (di, props) => ({
-    userStore: di.inject(userStoreInjectable),
+    userStore: di.inject(userPreferencesStoreInjectable),
     ...props,
   }),
 });

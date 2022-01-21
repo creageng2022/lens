@@ -3,11 +3,11 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import userStoreInjectable from "./store.injectable";
+import userPreferencesStoreInjectable from "./store.injectable";
 
-const resetThemeSettingsInjectable = getInjectable({
-  instantiate: (di) => di.inject(userStoreInjectable).resetTheme,
+const resolvedShellInjectable = getInjectable({
+  instantiate: (di) => di.inject(userPreferencesStoreInjectable).resolvedShell,
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default resetThemeSettingsInjectable;
+export default resolvedShellInjectable;

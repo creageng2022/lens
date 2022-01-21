@@ -6,20 +6,20 @@
 import React, { useState } from "react";
 import { Input, InputValidators } from "../input";
 import { SubTitle } from "../layout/sub-title";
-import type { UserStore } from "../../../common/user-store";
+import type { UserPreferencesStore } from "../../../common/user-preferences";
 import { bundledKubectlPath } from "../../../main/kubectl/kubectl";
 import { SelectOption, Select } from "../select";
 import { Switch } from "../switch";
-import { packageMirrors } from "../../../common/user-store/preferences-helpers";
+import { packageMirrors } from "../../../common/user-preferences/preferences-helpers";
 import directoryForBinariesInjectable
   from "../../../common/app-paths/directory-for-binaries.injectable";
 import { withInjectables } from "@ogre-tools/injectable-react";
 import { observer } from "mobx-react";
-import userStoreInjectable from "../../../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../../../common/user-preferences/store.injectable";
 
 interface Dependencies {
   defaultPathForKubectlBinaries: string;
-  userStore: UserStore;
+  userStore: UserPreferencesStore;
 }
 
 const NonInjectedKubectlBinaries = observer(({ defaultPathForKubectlBinaries, userStore }: Dependencies) => {
@@ -96,6 +96,6 @@ const NonInjectedKubectlBinaries = observer(({ defaultPathForKubectlBinaries, us
 export const KubectlBinaries = withInjectables<Dependencies>(NonInjectedKubectlBinaries, {
   getProps: (di) => ({
     defaultPathForKubectlBinaries: di.inject(directoryForBinariesInjectable),
-    userStore: di.inject(userStoreInjectable),
+    userStore: di.inject(userPreferencesStoreInjectable),
   }),
 });

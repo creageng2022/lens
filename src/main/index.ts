@@ -37,7 +37,7 @@ import directoryForExesInjectable from "../common/app-paths/directory-for-exes.i
 import initIpcMainHandlersInjectable from "./initializers/init-ipc-main-handlers.injectable";
 import directoryForKubeConfigsInjectable from "../common/app-paths/directory-for-kube-configs.injectable";
 import clusterStoreInjectable from "../common/cluster-store/store.injectable";
-import userStoreInjectable from "../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../common/user-preferences/store.injectable";
 import kubeconfigSyncManagerInjectable from "./catalog-sources/kubeconfig-sync/manager.injectable";
 import lensProxyInjectableInjectable from "./lens-proxy/lens-proxy.injectable";
 import { initPrometheusProviderRegistry } from "./initializers/metrics-providers";
@@ -158,7 +158,7 @@ async function main() {
 
     logger.info("💾 Loading stores");
 
-    const userStore = di.inject(userStoreInjectable);
+    const userStore = di.inject(userPreferencesStoreInjectable);
 
     userStore.startMainReactions();
 

@@ -3,7 +3,7 @@
  * Licensed under MIT License. See LICENSE in root directory for more information.
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import { userStoreFileNameMigrationInjectionToken } from "../../common/user-store/file-name-migration-injection-token";
+import { userStoreFileNameMigrationInjectionToken } from "../../common/user-preferences/file-name-migration-injection-token";
 import { noop } from "../utils";
 
 const userStoreFileNameMigratiionInjectable = getInjectable({

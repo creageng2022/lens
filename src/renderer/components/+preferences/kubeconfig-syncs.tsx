@@ -8,8 +8,8 @@ import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { disposeOnUnmount, observer } from "mobx-react";
 import React from "react";
 import { Notice } from "../+extensions/notice";
-import type { KubeconfigSyncEntry, KubeconfigSyncValue, UserStore } from "../../../common/user-store";
-import userStoreInjectable from "../../../common/user-store/store.injectable";
+import type { KubeconfigSyncEntry, KubeconfigSyncValue, UserPreferencesStore } from "../../../common/user-preferences";
+import userPreferencesStoreInjectable from "../../../common/user-preferences/store.injectable";
 import { isWindows } from "../../../common/vars";
 import logger from "../../../main/logger";
 import { iter, multiSet } from "../../utils";
@@ -59,7 +59,7 @@ export function getAllEntries(filePaths: string[]): Promise<[string, Value][]> {
 }
 
 interface Dependencies {
-  userStore: UserStore;
+  userStore: UserPreferencesStore;
 }
 
 @observer
@@ -199,7 +199,7 @@ class NonInjectedKubeconfigSyncs extends React.Component<Dependencies> {
 
 export const KubeconfigSyncs = withInjectables<Dependencies>(NonInjectedKubeconfigSyncs, {
   getProps: (di, props) => ({
-    userStore: di.inject(userStoreInjectable),
+    userStore: di.inject(userPreferencesStoreInjectable),
     ...props,
   }),
 });

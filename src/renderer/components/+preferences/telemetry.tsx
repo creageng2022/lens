@@ -4,7 +4,7 @@
  */
 import { observer } from "mobx-react";
 import React from "react";
-import type { UserStore } from "../../../common/user-store";
+import type { UserPreferencesStore } from "../../../common/user-preferences";
 import { sentryDsn } from "../../../common/vars";
 import { Checkbox } from "../checkbox";
 import { SubTitle } from "../layout/sub-title";
@@ -13,11 +13,11 @@ import type { RegisteredAppPreference } from "./app-preferences/app-preference-r
 import appPreferencesInjectable from "./app-preferences/app-preferences.injectable";
 import type { IComputedValue } from "mobx";
 import { withInjectables } from "@ogre-tools/injectable-react";
-import userStoreInjectable from "../../../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../../../common/user-preferences/store.injectable";
 
 interface Dependencies {
   appPreferenceItems: IComputedValue<RegisteredAppPreference[]>;
-  userStore: UserStore;
+  userStore: UserPreferencesStore;
 }
 
 const NonInjectedTelemetry = observer(({ appPreferenceItems, userStore }: Dependencies) => {
@@ -58,6 +58,6 @@ const NonInjectedTelemetry = observer(({ appPreferenceItems, userStore }: Depend
 export const Telemetry = withInjectables<Dependencies>(NonInjectedTelemetry, {
   getProps: (di) => ({
     appPreferenceItems: di.inject(appPreferencesInjectable),
-    userStore: di.inject(userStoreInjectable),
+    userStore: di.inject(userPreferencesStoreInjectable),
   }),
 });

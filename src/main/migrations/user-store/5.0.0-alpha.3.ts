@@ -4,7 +4,7 @@
  */
 
 // Switch representation of hiddenTableColumns in store
-import type { UserStoreModel } from "../../../common/user-store";
+import type { UserPreferencesStoreModel } from "../../../common/user-preferences";
 import type { MigrationDeclaration } from "../helpers";
 
 export default {
@@ -21,4 +21,4 @@ export default {
 
     store.set("preferences", preferences);
   },
-} as MigrationDeclaration<UserStoreModel>;
+} as MigrationDeclaration<UserPreferencesStoreModel>;

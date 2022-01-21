@@ -4,12 +4,12 @@
  */
 
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
-import userStoreInjectable from "../../../../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../../../../common/user-preferences/store.injectable";
 import { getBaseRegistryUrl } from "./get-base-registry-url";
 
 const getBaseRegistryUrlInjectable = getInjectable({
   instantiate: (di) => getBaseRegistryUrl({
-    getRegistryUrlPreference: () => di.inject(userStoreInjectable).extensionRegistryUrl,
+    getRegistryUrlPreference: () => di.inject(userPreferencesStoreInjectable).extensionRegistryUrl,
   }),
 
   lifecycle: lifecycleEnum.singleton,

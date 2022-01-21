@@ -7,7 +7,7 @@ import { existsSync, readFileSync } from "fs";
 import path from "path";
 import os from "os";
 import type { ClusterStoreModel } from "../../../common/cluster-store/store";
-import type { KubeconfigSyncEntry, UserStoreModel } from "../../../common/user-store";
+import type { KubeconfigSyncEntry, UserPreferencesStoreModel } from "../../../common/user-preferences";
 import { MigrationDeclaration, migrationLog } from "../helpers";
 import { isLogicalChildPath } from "../../../common/utils";
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
@@ -19,7 +19,7 @@ interface Dependencies {
   kubeConfigsPath: string;
 }
 
-function getMigration({ userDataPath, kubeConfigsPath }: Dependencies): MigrationDeclaration<UserStoreModel> {
+function getMigration({ userDataPath, kubeConfigsPath }: Dependencies): MigrationDeclaration<UserPreferencesStoreModel> {
   return {
     version: "5.0.3-beta.1",
     run(store) {

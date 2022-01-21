@@ -5,14 +5,14 @@
 import { withInjectables } from "@ogre-tools/injectable-react";
 import { observer } from "mobx-react";
 import React from "react";
-import type { UserStore } from "../../../common/user-store";
-import userStoreInjectable from "../../../common/user-store/store.injectable";
+import type { UserPreferencesStore } from "../../../common/user-preferences";
+import userPreferencesStoreInjectable from "../../../common/user-preferences/store.injectable";
 import { Input } from "../input";
 import { SubTitle } from "../layout/sub-title";
 import { Switch } from "../switch";
 
 interface Dependencies {
-  userStore: UserStore;
+  userStore: UserPreferencesStore;
 }
 
 const NonInjectedLensProxy = observer(({ userStore }: Dependencies) => {
@@ -57,7 +57,7 @@ const NonInjectedLensProxy = observer(({ userStore }: Dependencies) => {
 
 export const LensProxy = withInjectables<Dependencies>(NonInjectedLensProxy, {
   getProps: (di, props) => ({
-    userStore: di.inject(userStoreInjectable),
+    userStore: di.inject(userPreferencesStoreInjectable),
     ...props,
   }),
 });

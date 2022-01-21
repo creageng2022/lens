@@ -21,8 +21,8 @@ import addToActiveHotbarInjectable from "../../../../common/hotbar-store/add-to-
 import { noop } from "../../../utils";
 import removeByIdFromActiveHotbarInjectable from "../../../../common/hotbar-store/remove-from-active-hotbar.injectable";
 import { getStorageLayerMock } from "../../../utils/__mocks__/storage-helper";
-import isTableColumnHiddenInjectable from "../../../../common/user-store/is-table-column-hidden.injectable";
-import toggleTableColumnVisibilityInjectable from "../../../../common/user-store/toggle-table-column-visibility.injectable";
+import isTableColumnHiddenInjectable from "../../../../common/user-preferences/is-table-column-hidden.injectable";
+import toggleTableColumnVisibilityInjectable from "../../../../common/user-preferences/toggle-table-column-visibility.injectable";
 import activeThemeInjectable from "../../../themes/active-theme.injectable";
 import { computed } from "mobx";
 import type { Theme } from "../../../themes/store";

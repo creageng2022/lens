@@ -10,7 +10,7 @@ import { inspect } from "util";
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import type { IComputedValue } from "mobx";
 import { bind } from "./utils";
-import allowErrorReportingInjectable from "./user-store/allow-error-reporting.injectable";
+import allowErrorReportingInjectable from "./user-preferences/allow-error-reporting.injectable";
 
 /**
  * "Translate" 'browser' to 'main' as Lens developer more familiar with the term 'main'

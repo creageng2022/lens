@@ -27,8 +27,8 @@ import { withInjectables } from "@ogre-tools/injectable-react";
 import openConfirmDialogInjectable from "../confirm-dialog/dialog-open.injectable";
 import type { ItemListLayoutState } from "./storage.injectable";
 import itemListLayoutStorageInjectable from "./storage.injectable";
-import isTableColumnHiddenInjectable from "../../../common/user-store/is-table-column-hidden.injectable";
-import toggleTableColumnVisibilityInjectable from "../../../common/user-store/toggle-table-column-visibility.injectable";
+import isTableColumnHiddenInjectable from "../../../common/user-preferences/is-table-column-hidden.injectable";
+import toggleTableColumnVisibilityInjectable from "../../../common/user-preferences/toggle-table-column-visibility.injectable";
 import activeThemeInjectable from "../../themes/active-theme.injectable";
 
 export type SearchFilter<I extends ItemObject> = (item: I) => string | number | (string | number)[];

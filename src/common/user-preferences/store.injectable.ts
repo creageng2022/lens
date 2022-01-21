@@ -4,15 +4,15 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { userStoreFileNameMigrationInjectionToken } from "./file-name-migration-injection-token";
-import { userStoreMigrationsInjectionToken } from "./migrations-injection-token";
-import { UserStore } from "./store";
+import { userPreferencesStoreMigrationsInjectionToken } from "./migrations-injection-token";
+import { UserPreferencesStore } from "./store";
 
-const userStoreInjectable = getInjectable({
-  instantiate: (di) => new UserStore({
+const userPreferencesStoreInjectable = getInjectable({
+  instantiate: (di) => new UserPreferencesStore({
     fileNameMigration: di.inject(userStoreFileNameMigrationInjectionToken),
-    migrations: di.inject(userStoreMigrationsInjectionToken),
+    migrations: di.inject(userPreferencesStoreMigrationsInjectionToken),
   }),
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default userStoreInjectable;
+export default userPreferencesStoreInjectable;

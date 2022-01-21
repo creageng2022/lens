@@ -15,7 +15,7 @@ import moment from "moment-timezone";
 import type { Align, ListOnScrollProps } from "react-window";
 
 import { LogSearchStore } from "../log-search/store";
-import type { UserStore } from "../../../../common/user-store";
+import type { UserPreferencesStore } from "../../../../common/user-preferences";
 import { array, cssNames, disposer } from "../../../utils";
 import { Spinner } from "../../spinner";
 import { VirtualList } from "../../virtual-list";
@@ -26,7 +26,7 @@ import { withInjectables } from "@ogre-tools/injectable-react";
 import logSearchStoreInjectable from "../log-search/store.injectable";
 import logTabStoreInjectable from "../log-tab/store.injectable";
 import logsStoreInjectable from "./store.injectable";
-import userStoreInjectable from "../../../../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../../../../common/user-preferences/store.injectable";
 
 export interface LogListProps {
   logs: string[]
@@ -42,7 +42,7 @@ interface Dependencies {
   logSearchStore: LogSearchStore;
   logTabStore: LogTabStore;
   logsStore: LogsStore;
-  userStore: UserStore;
+  userStore: UserPreferencesStore;
 }
 
 export interface LogListRef {
@@ -239,7 +239,7 @@ export const LogList = withInjectables<Dependencies, LogListProps>(NonInjectedLo
     logSearchStore: di.inject(logSearchStoreInjectable),
     logTabStore: di.inject(logTabStoreInjectable),
     logsStore: di.inject(logsStoreInjectable),
-    userStore: di.inject(userStoreInjectable),
+    userStore: di.inject(userPreferencesStoreInjectable),
     ...props,
   }),
 });

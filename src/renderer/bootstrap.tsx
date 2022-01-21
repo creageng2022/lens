@@ -27,7 +27,7 @@ import extensionLoaderInjectable from "../extensions/extension-loader/extension-
 import extensionDiscoveryInjectable from "../extensions/extension-discovery/extension-discovery.injectable";
 import extensionInstallationStateStoreInjectable from "../extensions/extension-installation-state-store/extension-installation-state-store.injectable";
 import clusterStoreInjectable from "../common/cluster-store/store.injectable";
-import userStoreInjectable from "../common/user-store/store.injectable";
+import userPreferencesStoreInjectable from "../common/user-preferences/store.injectable";
 import initRootFrameInjectable from "./frames/root-frame/init-root-frame/init-root-frame.injectable";
 import initClusterFrameInjectable from "./frames/cluster-frame/init-cluster-frame/init-cluster-frame.injectable";
 import isAllowedResourceInjectable from "./utils/allowed-resource.injectable";
@@ -55,7 +55,7 @@ async function bootstrap() {
   await di.runSetups();
 
   // TODO: Remove temporal dependencies to make timing of initialization not important
-  di.inject(userStoreInjectable);
+  di.inject(userPreferencesStoreInjectable);
 
   if (process.isMainFrame) {
     di.inject(initializeSentryReportingInjectable);

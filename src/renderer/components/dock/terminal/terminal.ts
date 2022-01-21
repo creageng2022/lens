@@ -15,11 +15,13 @@ import { once } from "lodash";
 import { clipboard } from "electron";
 import logger from "../../../../common/logger";
 import fontPath from "../../fonts/roboto-mono-nerd.ttf";
+import type { TerminalConfig } from "../../../../common/user-preferences/preferences-helpers";
 
 export interface TerminalDependencies {
   readonly dockStore: DockStore;
   readonly terminalColors: IComputedValue<Record<string, string>>;
   readonly terminalCopyOnSelect: IComputedValue<boolean>;
+  readonly terminalConfig: IComputedValue<TerminalConfig>;
 }
 
 export class Terminal {
@@ -34,12 +36,7 @@ export class Terminal {
     document.fonts.add(fontFace);
   }
 
-  private xterm: XTerm | null = new XTerm({
-    cursorBlink: true,
-    cursorStyle: "bar",
-    fontSize: 13,
-    fontFamily: "RobotoMono",
-  });
+  private xterm: XTerm;
   private readonly fitAddon = new FitAddon();
   private scrollPos = 0;
   private readonly disposer = disposer();
@@ -72,6 +69,15 @@ export class Terminal {
   }
 
   constructor(protected readonly dependencies: TerminalDependencies, public readonly tabId: TabId, protected readonly terminalApi: TerminalApi) {
+    const { fontSize, fontFamily } = this.dependencies.terminalConfig.get();
+
+    this.xterm = new XTerm({
+      cursorBlink: true,
+      cursorStyle: "bar",
+      fontSize,
+      fontFamily,
+    });
+
     // enable terminal addons
     this.xterm.loadAddon(this.fitAddon);
 
@@ -98,6 +104,8 @@ export class Terminal {
         fireImmediately: true,
       }),
       this.dependencies.dockStore.onResize(this.onResize),
+      reaction(() => this.dependencies.terminalConfig.get().fontSize, this.setFontSize),
+      reaction(() => this.dependencies.terminalConfig.get().fontFamily, this.setFontFamily),
       () => onDataHandler.dispose(),
       () => this.fitAddon.dispose(),
       () => this.terminalApi.removeAllListeners(),
@@ -190,6 +198,14 @@ export class Terminal {
     if (this.dependencies.terminalCopyOnSelect.get() && selection) {
       clipboard.writeText(selection);
     }
+  };
+
+  setFontSize = (size: number) => {
+    this.xterm.options.fontSize = size;
+  };
+
+  setFontFamily = (family: string) => {
+    this.xterm.options.fontFamily = family;
   };
 
   keyHandler = (evt: KeyboardEvent): boolean => {

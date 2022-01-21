@@ -5,7 +5,7 @@
 import { action, observable, IComputedValue, computed, ObservableMap, makeObservable, observe } from "mobx";
 import type { CatalogEntity } from "../../../common/catalog";
 import { Disposer, iter } from "../../../common/utils";
-import type { KubeconfigSyncValue } from "../../../common/user-store";
+import type { KubeconfigSyncValue } from "../../../common/user-preferences";
 import type { LensLogger } from "../../../common/logger";
 
 export interface KubeconfigSyncManagerDependencies {

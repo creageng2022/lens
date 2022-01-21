@@ -4,15 +4,15 @@
  */
 import { getInjectable, lifecycleEnum } from "@ogre-tools/injectable";
 import { computed } from "mobx";
-import userStoreInjectable from "./store.injectable";
+import userPreferencesStoreInjectable from "./store.injectable";
 
-const terminalThemeIdInjectable = getInjectable({
+const terminalCopyOnSelectInjectable = getInjectable({
   instantiate: (di) => {
-    const userStore = di.inject(userStoreInjectable);
+    const userStore = di.inject(userPreferencesStoreInjectable);
 
-    return computed(() => userStore.terminalTheme);
+    return computed(() => userStore.terminalCopyOnSelect);
   },
   lifecycle: lifecycleEnum.singleton,
 });
 
-export default terminalThemeIdInjectable;
+export default terminalCopyOnSelectInjectable;
